@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cell>
+  <stem>°.Cell</stem>
+  <reaction>context.cell.Children.add                   °.Prophet.Literal.String.eventMessage
+	context.eventMessage.cell.setStem           parent.message
+	context.eventMessage.cell.Active.setTrue    °
+	message.stem                                context.eventMessage
+	context.eventMessage.reply.ifTrue           ifTrueReaction</reaction>
+</cell>
+

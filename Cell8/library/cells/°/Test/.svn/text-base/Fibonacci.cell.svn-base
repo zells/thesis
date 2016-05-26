@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cell>
+  <stem>°.Cell</stem>
+  <reaction>cell.create.isOne                   °.Zells.Literal.Number.1
+	message.equals                      isOne
+	isOne.response.ifTrue               respondOne
+	cell.create.isZero                  °.Zells.Literal.Number.0
+	message.equals                      isZero
+	isZero.response.ifTrue              respondZero
+	isOne.response.or                   isZero.response
+	isZero.response.response.ifFalse    respondSum</reaction>
+</cell>
+

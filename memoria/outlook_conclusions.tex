@@ -1,0 +1,228 @@
+\graphicspath{{figures/outlook_conclusion/}}
+
+\chapter{Outlook \& Conclusions} % top level followed by section, subsection
+
+\section{High Level Language}
+\label{sec:language}
+
+The examples in Sections \ref{sec:example} and \ref{sec:experience} show how the platform can be programmed by only using basic messages. To create applications more efficiently, a higher level programming language is needed. This section presents the draft of a language which uses as little syntactical constructs as possible to reach the expressiveness of modern programming languages. The constructs are described informally using examples.
+
+Listing \ref{lst:lang_example} gives an example of the syntax by implementing the recursive algorithm to calculate a number of the Fibonacci sequence as described in Section \ref{sec:experience} using the high level language. The content of the listing corresponds to the definition of a reaction to create and define all cells of the application. This reaction would only need to be executed once since all created cells are always persistent.
+
+\begin{lstlisting}[mathescape, float=hbt, label=lst:lang_example, 
+caption=Implementation the Fibonacci algorithm using a high level language]
+Fibonacci : $\circ$.Cell {
+	index : message .
+	[[index.equals 0].or [index.equals 1]] (
+		ifTrue [{index.respond index}] .
+		ifFalse [{
+			index.respond [[Fibonacci [index.subtract 1]].add 
+					[Fibonacci [index.subtract 2]]]
+		}]
+	)
+}
+\end{lstlisting}
+
+
+\subsection{Extended Scope}
+
+As described in Section \ref{sec:binding}, the lexical scope of a cell does not include enclosing cells. For convenience, the parser of the presented language allows omitting preceding \cell{parent} references which are added when the code is compiled into mailings. Its usage is therefore restricted to children of enclosing cells which already exist or are defined in the same compilation unit when compiling. As in Listing \ref{lst:lang_example}, \cell{message} aliases can be specialized to resolve ambiguous references when omitting \cell{parent}.
+
+\subsection{Answers}
+As described before, a mailing consists of the receiver and message cells. If a response is expected, a cell to which the response can be sent has to be provided as part of the message, due to the asynchronism of mailings (see Section \ref{sec:example_extended}). By convention, this cell is a child of the message with the name \cell{respond}. Its default reaction creates a child \cell{response} of the message cell with the received cell as its stem. As can be seen in the example in Section \ref{sec:example}, this behaviour can be used for data flow synchronization by sending a message to \cell{response} which will be repeated until \cell{response} exists, i.e. a response was received.
+
+The language draft provides a construct called \textit{answer} which creates a container cell and accesses its \cell{response} child implicitly. An answer is a mailing surrounded by brackets and can be used as a reference to the \cell{response} of the container cell. Listing \ref{lst:lang_answers} shows an example of its usage and the corresponding list of equivalent mailings.
+
+\begin{lstlisting}[mathescape, float=hbt, label=lst:lang_answers, 
+caption=Implicit answers and equivalent mailings]
+message.respond [[True.or False].and [False.or True]]
+
+$cell.create.container1 \leftarrow \circ.False$
+$True.or \leftarrow container1$
+
+$cell.create.container2 \leftarrow \circ.True$
+$False.or \leftarrow container2$
+
+$cell.create.container3 \leftarrow container2.response$
+$container1.response.and \leftarrow container3$
+
+$message.respond \leftarrow container3.response$
+\end{lstlisting}
+
+
+\subsection{Definitions}
+
+To create and define a new cell with stem path and reaction requires a large number of regular mailings. Although the easiest case, creating a cell without reaction and a static stem cell, can be expressed with a single mailing as in the example in Section \ref{sec:example_extended}. For more complex cases, the language provides a construct which allows compact cell creation and definition. Table \ref{tab:lang_definition_usage} contains example usages of the cell definitions syntax and an explanation of their meanings.
+
+
+\begin{table}[htbp]
+
+\caption{Examples usage of cell definitions.}
+\centering
+
+\begin{tabular}{lp{0.45\textwidth}}
+
+\bf{Definition} & \bf{Explanation}\\
+\hline\hline
+\begin{minipage}[t]{0.5\textwidth}
+\begin{verbatim}
+A.NewCell : Its.StemCell { 
+  First.Receiver ItsMessage
+  SecondReceiver AnotherMessage
+}
+\end{verbatim}
+\end{minipage} & Creates a cell \cell{NewCell} as child of \cell{A} and sets \cell{Its.StemCell} as its stem cell (relative to \cell{NewCell}). Defines \cell{NewCell}'s reaction with two mailings.\\
+
+\hline
+
+\begin{minipage}[t]{0.5\textwidth}
+\begin{verbatim}
+[List {Its Reaction}].add SomeCell
+\end{verbatim}
+\end{minipage} & Creates an anonymous cell whose stem cell is \cell{List} and adds \cell{SomeCell} as an element. No further elements can be added since anonymous cells can only be referenced using their definition.\\
+
+\hline
+
+\begin{minipage}[t]{0.5\textwidth}
+\begin{verbatim}
+True.or [°.False]
+\end{verbatim}
+\end{minipage} & Sends a new anonymous sub-cell of \cell{False} to \cell{True.or}.\\
+
+\hline
+
+\begin{minipage}[t]{0.5\textwidth}
+\begin{verbatim}
+{do something} Cell
+\end{verbatim}
+\end{minipage} & Creates an anonymous cell with only a reaction and sends \cell{Cell} to it to execute the reaction.\\
+
+\hline
+
+\begin{minipage}[t]{0.5\textwidth}
+\begin{verbatim}
+True.ifTrue [{do conditionally}]
+\end{verbatim}
+\end{minipage} & Creates an anonymous cell with only a reaction and sends it to \cell{True.ifTrue}. As a result, \cell{ifTrue} sends a message to the anonymous cell and its reaction is executed.
+
+\end{tabular}
+
+\label{tab:lang_definition_usage}
+
+\end{table}
+
+
+\subsection{Spaces}
+
+Many messages are often sent to the same cell or children of a common parent. To avoid repetition of a cell path in such a case, parentheses can be used to create a \textit{space} in which all paths are relative to the preceding cell, which is especially useful in combination with anonymous cells. Table \ref{tab:lang_space} contains examples of how to use this construct and their explanations.
+
+\begin{table}[htbp]
+
+\caption{Examples usage of spaces.}
+\centering
+
+\begin{tabular}{lp{0.45\textwidth}}
+
+\bf{Usage} & \bf{Explanation}\\
+\hline\hline
+
+\begin{minipage}[t]{0.5\textwidth}
+\begin{verbatim}
+aList.add [Person (
+  name : °.Literal.String.John
+  age : °.Literal.Number.26
+)]
+\end{verbatim}
+\end{minipage} & Creates an anonymous sub-cell of \cell{Person} with two children \cell{name} and \cell{age} and adds a new element to \cell{aList} with the anonymous cell as its stem cell.\\
+
+\hline
+
+\begin{minipage}[t]{0.5\textwidth}
+\begin{verbatim}
+[Point (x:x1. y:y1)].moveTo 
+    [(x:x2. y:y2)]
+\end{verbatim}
+\end{minipage} & Sends an anonymous cell with two children to the \cell{moveTo} child of a sub-cell of \cell{Point}. This example illustrates how spaces can be used to simulate arguments in a method call.
+
+\end{tabular}
+
+\label{tab:lang_space}
+
+\end{table}
+
+\section{Future Work}
+
+The current version of the presented software platform only covers the most basic features to prove the implementability of its programming model. This section describes some of the next steps and current approaches which lead to a usable personal computing platform.
+
+\begin{description}
+
+\item[Security]
+
+For a distributed system, access control is a crucial feature. To prevent unwanted messages from being received, but also to provide encapsulation, fine-grained access control on object level is required. How this can be achieved efficiently will be the subject of future investigation. A possible approach is to use certificate-based access control \cite{CertificateAccess} using white-/black-lists or roles \cite{CertificationRoles}. The platform's architecture would lend itself naturally to serve as a distributed public key infrastructure.
+
+The most critical security factor however is the end user \cite{SecurityAwareness}. In order to have a safe system, its users need to understand and be aware of security and privacy concerns. This requires educational work independent of any system but also clarity and transparency of the software platform.
+
+\item[Parallelism]
+
+In order to prevent timing errors, the system needs to be extended by the ability to restrict the concurrent execution of reactions. Cells restricted in this way are not able to receive messages while their reaction is executing and therefore use a mailbox to store these messages. The restriction also has implications on the possible distribution of such cells which have to be analysed. 
+
+\item[Performance]
+
+Due to its complete distribution which results in having to resolve the receiver of every single mailing recursively, the performance of the prototype implementation is not as good as with existing commercial programming languages. Since it was not a requirement of the prototype, few experiments were conducted to quantify the performance and no measures were taken to improve it. Caching on multiple levels is considered as the most effective approach to improve performance. Results of name resolutions could be stored and re-used, as well as memory location for cells in the same address-space. Since cells are principally mobile, communication partners can be migrated to other hosts to reduce network traffic and resulting latency. Mechanisms to ensure consistency have to be provided and their overhead considered to calculate the net performance increase.
+
+\item[Memory Management]
+
+The presented programming model introduces new challenges regarding memory management which includes identifying and deleting disposable cells. Conventional garbage collection is not applicable since a cell never becomes unreachable due to the fact that all references are completely late-bound. Therefore, a more general approach is required that is not only used for application cells but also to user cells.
+
+In a distributed system, memory management also includes the migration and distribution of entities. This requires the development of strategies which consider processor load, memory usage and network capacities. Ideally, these mechanisms work completely automatically but the ability for assisted manual optimization should be offered as well.
+
+\item[Library]
+
+In order to develop portable systems efficiently, the software platform has to provide a standard cell library which provides reflection, hardware access and generic implementations for frequently needed functionality (as provided by \cite{GnuSmalltalk}). The library can be distributed as well and does not have to reside in the local host, except for the parts of it that are implemented on the kernel level. It is also possible to replace any cell seamlessly with a native implementation for optimization. A key principle of the library's design has to keep meaning separated from optimization as suggested by \cite{Steps2008}.
+
+Hardware access includes interaction with users and external devices. Graphical output uses real-world units instead of pixels and uses exclusively vector graphics (as done in \cite{Steps2007}) to be independent of screen size and resolution. The library also contains cells for literal values, such as strings and numbers, cells for numerical and boolean algebra as well as collections and control structures. Any user can extend the standard library by creating a sub-cell of it.
+
+\item[Language]
+
+The platform does not include a native language. Its native instructions are mailings consisting of receiver and message cells. To develop systems efficiently, a more expressive language is required. In Section \ref{sec:language} the syntax of a language draft was described informally which extends the basic instructions very little and thus can easily be translated into mailings.
+
+The platform architecture should facilitate and encourage the use of different, possibly domain-specific, front-end languages. Because of a common underlying programming model, a system written in any language would be able to communicate seamlessly with any system on any host written in any other language. To increase end-user literacy, a graphical scripting-like way of programming should also be included.
+
+\item[Typing]
+
+The programming model does not have a type system. Because of its value to system analysis and resulting coding assistance, a type system can be added as hints when needed (similar to \cite{PluggableTypes}). These hints could be formulated as cell definitions expressing expected stem cells or children of messages and responses. These definitions would not have any effect on the system but could be used by an automatic analyzer to detect errors and provide coding assistance such as auto-completion.
+
+\item[Formalization]
+
+To study the implications of distribution and concurrency more thoroughly, the semantics of the programming model will be formalized. Using model checking \cite{ModelChecking}, the model can then be tested for exclusion of undesired situations such as dead-locks and inconsistency to prove its correctness \cite{Spin}. Another advantage of a formalization is to translate it automatically into native code for different machines and thus produce completely compatible executables for multiple platforms.
+
+\item[Versions]
+
+A desirable feature of the software platform and important for usability is fine-grained version control. All changes to any cell should be saved and be reversible. The system should allow the user to tag, discard and reverse to certain versions and also to create branches. Since this capability would not only apply to data but also to its representation, users could browse through any program like websites, always being able to return to previous views or keep a certain view open and branch into new views simultaneously, like opening new tabs in browsers \cite{Steps2010}.
+
+It is not clear how to determine the scope of versions. The user should be able to control whether to reverse changes made only to a certain cell, to the cell and its children, or all changes to every cell. The last option would require performing all actions in a sandbox which can be committed or discarded by the user (similar to  \cite{Worlds}). This would allow the user to conduct experiments with any system in a safe environment with complete control over side-effects.
+
+\item[Extensibility]
+
+The goal of the platform is to be completely open and extensible which entails every part of the platform being exposed to the user by reflection. This is already the case for all parts except for the semantics of message sending. Since it is the only operation of the programming model, being able to modify its semantics would allow the user to adapt the semantics of the entire model if needed \cite{OpenObjects}. Design decisions like single inheritance or lexical scope could be changed for any part of a cell system while running, leading to a completely extensible software platform which is regarded as a crucial feature for its survival.
+
+\end{description}
+
+\section{Conclusions}
+
+The thesis intends to help making the real computer revolution happen by laying the groundwork of a new software platform that encourages collaborative model building. First, the programming model was developed and implemented during several iterations using modern software development methods. Following this, the kernel implementation was connected with the local and remote systems. Finally, an object library and graphical development tools were implemented to support the development of example application which were used to test the system.
+
+The result is a working prototype implementation of the software platform including two sample applications and an extensive set of unit tests. Although its low performance and immaturity prevent the platform from being practical it is a usable base for further investigation, experiments and improvements.
+
+In conclusion, the thesis shows that it is possible to implement a completely abstracted and simplistic programming model in a concurrent and distributed software platform. A distributed name directory for path resolution could be implemented within the models structure. The model was constructed using a single kind of entity that represents an abstracted computing unit without the use of any low level concepts such as variable or assignments. It also has been demonstrated that message passing combined with hierarchical object identifiers is a suitable primitive operation that could form part of a common inter-platform language.
+
+
+
+
+
+
+
+
+
+
+

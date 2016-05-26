@@ -1,0 +1,131 @@
+package org.zells.peers;
+
+import java.io.*;
+import java.net.*;
+import java.util.*;
+
+import org.zells.*;
+
+public class SocketServer extends Server {
+	
+	private ServerSocket socket;
+	private String hostname;
+	private int port;
+	
+	public SocketServer(Cell root) {
+		super(root);
+	}
+	
+	@Override
+	public void run() {
+		try {
+			socket = new ServerSocket(port);
+			
+			log("Server started on " + socket);
+			
+			while (true) {
+				new Dispatcher(socket.accept()).start();
+			}
+		} catch (Exception e) {
+			if (e.getMessage() == null || !(e instanceof SocketException))
+				e.printStackTrace();
+			else log("Socket closed.");
+		}
+	}
+	
+	@Override
+	protected void close() {
+		try {
+			socket.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Override
+	public Address getAddress() {
+		return new Address("Socket", hostname + ":" + port);
+	}
+	
+	@Override
+	public Map<String, String> getParameters() {
+		HashMap<String, String> params = new HashMap<String, String>();
+		params.put("Hostname", "localhost");
+		params.put("Port", "42");
+		return params;
+	}
+	
+	@Override
+	protected void setParameters(Map<String, String> params) throws Exception {
+		if (params.get("Hostname").isEmpty())
+			throw new Exception("Hostname must not be empty.");
+		
+		hostname = params.get("Hostname");
+		
+		try {
+			port = Integer.parseInt(params.get("Port"));
+		} catch (Exception e) {
+			throw new Exception("Port has to be an integer.", e);
+		}
+	}
+	
+	private class Dispatcher extends Thread {
+		
+		private Socket client;
+		
+		public Dispatcher(Socket socket) {
+			log("New incoming connection: " + socket);
+			this.client = socket;
+		}
+		
+		@SuppressWarnings("unchecked")
+		@Override
+		public void run() {
+			
+			Result res;
+			
+			DeliveryId eid = new DeliveryId(9999);
+			try {
+				ObjectInputStream is = new ObjectInputStream(client.getInputStream());
+				
+				
+				Path origPath = (Path) is.readObject();
+				LinkedList<Delivery> deliveryStack = (LinkedList<Delivery>) is.readObject();
+				Path message = (Path) is.readObject();
+				eid = (DeliveryId) is.readObject();
+				
+				Cell deliverer = root;
+				for (String name : origPath.subPath(1, 0)) {
+					Cell parent = deliverer;
+					deliverer = parent.getChild(name);
+					
+					if (deliverer == null)
+						throw new Exception("Cell not found: " + name + " in " + parent + "(on " + getAddress() + ")");
+				}
+				
+				res = deliverer.deliver(deliveryStack, message, eid);
+				
+				log("Message delivered to " + res.deliveredTo);
+			} catch (Exception e) {
+				log("Server could not deliver: " + e.getMessage());
+				e.printStackTrace();
+				res = new Result();
+				res.log.add(new Result.Log.Entry(eid, root.getPath(), "Server could not deliver: " + e.getMessage()));
+			}
+			
+			try {
+				ObjectOutputStream os = new ObjectOutputStream(new BufferedOutputStream(client.getOutputStream()));
+				
+				os.writeObject(res);
+				os.flush();
+				
+				client.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+				log("Error while sending result: " + e.getMessage());
+			}
+			
+		}
+	}
+	
+}

@@ -1,0 +1,71 @@
+
+\graphicspath{{figures/methods/}}
+
+%: ----------------------- name of chapter  -------------------------
+\chapter{Methods}
+
+This chapter describes the methods and techniques used during the development of the presented software platform. Due to the explorative nature of the project, methods supporting an iterative style of development were chosen. The following sections describe different approaches to software engineering and two applied methods in more detail.
+
+%: ----------------------- section ------------------------
+\section{Software Development}
+
+According to the IEEE\nomenclature{IEEE}{Institute of Electrical and Electronics Engineers}, software development is part of software engineering which is defined as (1) The application of a systematic, disciplined, quantifiable approach to the development, operation, and maintenance of software; that is, the application of engineering to software. (2) The study of approaches as in (1). \cite{IeeeGlossary}
+
+There are generally two classes of methodologies, independent of their field of application. The \textit{top-down} method starts with the abstract and proceeds to the concrete while the \textit{bottom-up} follows the opposite direction. \cite{Balzert}. In software development, the two classes correspond to the general fields of \textit{structured} methods and \textit{agile} approaches, respectively. While structured methods focus on predictability, agile development puts more emphasis on adaptation.
+
+The NATO\nomenclature{NATO}{North Atlantic Treaty Organization} Software Engineering Conference in 1968 \cite{NatoConference} marks the beginning of systematic approaches to software development in order to address issues caused by the complexity of computer programs \cite{HumbleProgrammer}. Early manifestations of this approach are the waterfall model and structured programming. As illustrated in Figure \ref{fig:waterfall_model}, the former models the development process as a linear sequence of several phases, with the output of each phase being the input of the next. While its strict linearity was already described by its introducer as being risky and inviting failure \cite{ManagingLargeSystems}, the model has reached widespread acceptance and popularity.
+
+\figuremacro{waterfall_model}{Waterfall model with six phases}
+{A waterfall process model with six phases: Requirements, Analysis, Design, Coding, Testing and Operation.}
+
+The waterfall process model is an extreme on the continuum between top-down and bottom-up methods and is only applicable for solutions to very well understood problems which can be completely planned and designed in advance. Since in practice this type of project is very rare, modified waterfall models have been introduced which allow iteration by providing feedback channels between certain or all phases.
+
+Agile software development is placed on the other end of the continuum and recommends many iteration of the complete process in very short cycles in the magnitude of weeks. It uses process models such as the spiral model which adds the dimension of \textit{completeness}. Figure \ref{fig:agile_model} illustrates the transition from a iterative waterfall model to the spiral model. According to this model, the development runs through all phases with only a small subset of the product's requirements and increases the set with each iteration.
+
+\figuremacro{agile_model}{Transition from waterfall to spiral model}
+{Transistion from linear waterfall model to iterative spiral model using feedback channels.}
+
+Although used in practice as early as the 1950s, public awareness of agile development methods was very low until the 1990s when most standardized method emerged such as Scrum, Feature Driven Development (FDD\nomenclature{FDD}{Feature Driven Development}) and Extreme Programming (XP\nomenclature{XP}{Extreme Programming}) \cite{AgileHistory}. These methods gained very quickly popularity especially in the development of internet applications. The term \textit{agile development} was introduced in 2001 by the \textit{Manifesto for Agile Software Development} \cite{AgileManifesto}.
+
+In practice, software projects use a methodology located between these two extremes, considering project and team size, budget, time limits and other influences. More stable and well understood projects use fewer and longer iteration cycles while more risky and dynamic projects are best suited with shorter cycles and releasing often.
+
+
+%: ----------------------- section ------------------------
+\section{Prototyping}
+\label{sec:prototyping}
+
+Due to its explorative nature, an agile software development method was used in this project called \textit{rapid prototyping}. A prototype is a executable program which does not implement all features required for the final product but only those that serve a specific purpose. The method follows the spiral model illustrated in Figure \ref{fig:agile_model} where each iteration produces a prototype which is used for experiments to revise existing requirements and determine new ones.
+
+The advantage of prototyping is a tight feedback loop. Errors in analysis and design are identified early while the cost of changes is still low. Prototypes are also a useful mean to facilitate communication with a client or amongst developers since concrete implementations can be discussed instead of abstract descriptions. Disadvantages of prototyping are increased costs during early stages of a project and the risk of distraction from proper analysis which may lead to a decreased robustness. These characteristics also hold true for other iterative development methods. The unique character of prototyping is that it prototypes do not necessarily form the base of future iteration but are often thrown away.
+
+During this project, prototyping was used to verify and improve the programming model. The model was implemented with low cost into a prototype which was then used to verify the model using experiments. Several level of experiments were used reaching from simple message passing in different cell system constellations to complete example applications. Each prototype lead to an improved version of the programming model or the binding algorithm which was implemented into a new prototype. In total, eight iterations were traversed during the project.
+
+
+%: ----------------------- section ------------------------
+\section{Test-Driven Development}
+\label{sec:tdd}
+
+A technique tightly coupled with agile software development is \textit{Test-Driven Development} (TDD\nomenclature{TDD}{Test Driven Development}). As shown in Figure \ref{fig:tdd}, the testing and development phases of the waterfall model are swapped, putting testing first. The model is best suited for the development of small, independent functional units which can be validated by automated tests called \textit{unit tests}. This proceeding has several advantages: \cite{TestDrivenDevelopment}
+
+\begin{description}
+\item[Better tests.]{Programmers tend to avoid critical constellations -- mostly unconsciously -- if they exactly know what the tested code is doing. Tests written beforehand are less prejudiced.}
+
+\item[Better design.]{When writing a test first, the developer has to think about a module's interface before its implementation. Writing small, clearly structured and loosely coupled modules is enforced since convoluted systems are not testable. If a module cannot be tested, it is refactored.}
+
+\item[Confidence.]{Being able to test each part of a system at any time, project members
+become more confident about its reliability. Refactoring becomes less dangerous
+and is performed more often \cite{FowlerRefactoring}.}
+
+\item[Higher test coverage.]{Writing tests is a tedious task and mostly not done because
+of time pressure. Doing it first requires less discipline and results in more tests.}
+
+\end{description}
+
+\figuremacro{tdd}{Process model of test-driven development}
+{Process model of test-driven development.}
+
+The applicability of TDD is limited by the range of automated testing. Concurrent processes, graphical user interfaces and system integration can not or only with difficulty be tested automatically \cite{ExtremeProgramming}. In some cases the method can still be applied by designing tests which require manual validation before implementation.
+
+In this project, TDD was applied with great success to implement all of the described parts of the software platform. The characteristics of automated testing as executable requirements specification proved especially useful with each new prototype. While the design of the system changed significantly between two iterations, the test suite almost did not changed and thus ensured that the new prototype provides all features of the last one including all bug fixes. In average, each prototype used approximately 70 unit tests.
+
+Test-Driven Development is to a development cycle like the development cycle to the project. It provides a tight feedback loop and enables the developer to solve a problem in small steps. Like development cycles, the size of the steps can be adapted to the problem. Big steps can be taken on well known ground and small steps on new ground or when a big steps fails.

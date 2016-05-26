@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cell>
+  <stem>°.Cell</stem>
+  <reaction>
+    message.cell.Children.add                    °.Prophet.Literal.String.reply
+	message.reply.cell.cell.Children.add         °.Prophet.Literal.String.Stem
+	message.reply.cell.setStem                   °.Prophet.True
+	message.reply.cell.Active.setTrue            °
+  </reaction>
+</cell>
+

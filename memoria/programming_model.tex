@@ -1,0 +1,490 @@
+\graphicspath{{figures/programming_model/}}
+
+\chapter{Programming Model}
+\label{chap:programming_model}
+
+This chapter describes the programming model in a top-down fashion. The first section describes the concepts and design of the model, followed by the demonstration of these with the help of an example. The last section describes the implementation of the model. It covers only the parts which directly derive from the model, further parts of the kernel are described in Chapter \ref{chap:development_environment}.
+
+%-----------------------------------------------------
+%-----------------------------------------------------
+\section{Concepts}
+\label{sec:concepts}
+
+The programming model is presented in this section by introducing its concepts individually using the metaphor of a biological cell as suggested in \cite{SmalltalkHistory}.
+
+%-----------------------------------------------------
+\subsection{Cells}
+
+The model consists of a single kind of behavioural building block called \textit{cell}. Like biological cells, these virtual cells live independent of each other and are able to react concurrently. Cells can be nested arbitrarily. Nested cells are called \textit{children} and the containing cell \textit{parent}. This results in a hierarchical structure with a global \textit{root} cell named "$\circ$". Figure \ref{fig:cells} illustrates nested cells.
+
+\figuremacro{cells}{Nested cells}
+{A single kind of hierarchically structured behavioural building block.}
+
+%-----------------------------------------------------
+\subsection{Names and Paths}
+
+Each cell has a name which is unique amongst its siblings. A parent cell can address one of its children using its name. Children can address their parent cell using "parent" and the root cell with "$\circ$". A cell can always address itself using "self". Cell names can be combined to form a cell \textit{path} which leads from an origin to a destination cell. Cell paths are analogue to paths in file systems where ".", ".." and "/" correspond with "self", "parent" and "$\circ$" respectively. These references are called \textit{aliases}.
+
+Figure \ref{fig:names} illustrate an example of nested cells with names and aliases. In this example, the path \cell{Roots.parent.Trunk.Branch} (using dots to separate cells) leads from \cell{Tree} to \cell{Branch}. 
+
+\figuremacro{names}{Nested cells with names and aliases}
+{Nested cells with names and aliases.}
+
+%-----------------------------------------------------
+\subsection{Messages}
+
+The only way of communication between two cells is by sending messages. A message is a cell which is sent from a sender to a receiver cell as illustrated in Figure \ref{fig:message}. Message passing is always asynchronous which means that the sender does not wait for the message to be received and processed.
+
+\figuremacro{message}{Message passing}
+{A message is being sent from a sender to a receiver cell.}
+
+%-----------------------------------------------------
+\subsection{Reaction}
+\label{sec:reaction}
+
+A cell reacts on the event of receiving a message. All cells contain a description of how to react called \textit{reaction} which is executed each time the cell receives a message. As shown in Figure \ref{fig:reaction}, a reaction consists of \textit{mailings}, each containing the paths of the receiver and message cell, both relative to the sender. During execution, each mailing of the reaction is processed simultaneously, i.e. each message is sent to its corresponding receiver cell.
+
+\figuremacro{reaction}{Reaction of a cell}
+{A cell with its reaction consisting of mailings.}
+
+%-----------------------------------------------------
+\subsection{Specialisation}
+
+As with biological cells, the only way to create a new cell is by \textit{specializing} an existing cell. The created \textit{sub-cell} inherits all properties of the \textit{stem} cell which includes children and reaction. As depicted in Figure \ref{fig:specialisation}, the sub-cell can add further children or replace an inherited child or reaction, but it can not remove an inherited child. The relationship is strictly unidirectional and dynamic. This means that no change of the sub-cell can affect the stem cell but changes to the stem cell affect all sub-cells instantly. Also, the stem cell of an existing cell can be changed.
+
+\figuremacro{specialisation}{Example of specialisation}
+{\cell{John} specializes \cell{Person}, inherits \cell{Hands}, replaces \cell{Eyes} and extends it with \cell{Glasses}.}
+
+%-----------------------------------------------------
+\subsection{Execution}
+\label{sec:execution}
+
+The reaction is not executed by the receiver cell directly but by a new child which specializes the receiver. This \textit{execution cell} extends the receiver by the alias \cell{message} which is connected with the message cell as shown in Figure \ref{fig:execution}. Aliases can be compared with hard links in file systems thus \cell{X.message.parent} does not resolve to \cell{X} but to the parent of \cell{M}. The execution cell can also be extended by further children and therefore provide a storage space for local results which only matter to the execution.
+
+\figuremacro{execution}{Creation of execution when receiving a message}
+{A receiver creates a new execution that executes the reaction and which extends the receiver with an alias to the message cell.}
+
+%-----------------------------------------------------
+\subsection{Delivery}
+\label{sec:delivery}
+
+A message might not be delivered because of three possible reasons: an error, a non-existent receiver or a deactivated receiver. In either case, the message is re-sent until delivered successfully or explicitly cancelled. This enables messages to be sent to cells before they exist, e.g. results before they are calculated, which can be used for data flow synchronization as illustrated in Figure \ref{fig:data_flow}. A deactivated cell can not receive any message and deactivates all children except those that give access to its internal properties such as stem, reaction and children. This way cells with incomplete definitions can be made inaccessible.
+
+\figuremacro{data_flow}{Data flow synchronization}
+{Data flow synchronization of the the calculation $3 \cdot 4 + 2 \cdot 3$. The summation is executed earlier but waits for both multiplications.}
+
+%-----------------------------------------------------
+%-----------------------------------------------------
+\section{Example}
+\label{sec:example}
+
+The presented concepts of the programming model are illustrated in this section using an example application. The example is divided into two versions. A simple version illustrates the most basic concepts and an extended version illustrates the remaining concepts.
+
+Cells are defined in tables containing the hierarchy, name, stem cell path and reaction of the cell. Paths are written using dots to separate parents and children where \cell{parent} references are abbreviated with $\rho$. The mailings of reactions are written as "$receiver \leftarrow message$" where $receiver$ and $message$ are paths relative to the defined cell. Instead of using mailings, reactions may be described informally or left undefined and therefore inherited by the stem cell.
+
+%-----------------------------------------------------
+\subsection{Simple Version}
+
+The example application is a simple publish-subscribe system. Several cells can \textit{subscribe} to a channel and, as a result, receive all messages that have been \textit{published} on that channel. 
+
+\subsubsection{Definition}
+
+Table \ref{tab:simple_example} contains the definitions of the involved cells. Top-level cells are children of the root cell.
+
+\tablemacro{simple_example}{lll}{Cell definitions of simple example application}
+{Cell definitions of simple publish-subscribe example application.}
+{\bf{Cell}                    & \bf{Stem} & \bf{Reaction}}
+{Channel                      & Cell      & $subscribers.each \leftarrow forwardMessage$\\
+\texttt{|\_} forwardMessage   & Cell      & $message \leftarrow \parent.\parent.message$\\
+\texttt{|\_} subscribers      & List\\
+
+\hline
+
+Cell                          & Cell      & Does nothing\\
+List                          & Cell\\
+\texttt{|\_} each             & Cell      & Sends each element to its \cell{message}\\
+\texttt{|\_} add              & Cell      & Creates new element with message as stem\\}
+
+The first three rows define cells specific to the publish-subscribe application. The following definitions are generic cells which are part of a standard library and included for completeness. The specific cells are \cell{Channel} with its two children \cell{forwardMessage} and \cell{subscribers}. The cell \cell{Cell} is the default stem cell and the root of all specialisation hierarchies. Figure \ref{fig:simple_example} illustrates the defined cells and their relationships.
+
+\figuremacro{simple_example}{Defined cells for simple example application}
+{Composition (a) and inheritance (b) hierarchies of defined cells for a simple publish-subscribe system.}
+
+A cell can be published on the \cell{Channel} by being sent to it as a message. Every time the \cell{Channel} receives a message, its reaction is executed, i.e. its child \cell{forwardMessage} is sent to the child named \cell{each} of \cell{Channel}'s child \cell{subscribers}. Note that \cell{subscribers} inherits \cell{each} from \cell{List}. The reaction of \cell{each} is implemented on the kernel level and sends each of the list's elements to the cell that was received by \cell{each}, in this case \cell{forwardMessage}.
+
+As a result, \cell{forwardMessage} receives each of \cell{subscribers} elements. The instruction of \cell{forwardMessage}'s reaction is then executed with each subscriber as its \cell{message} and sends the published cell (the message received by \cell{Channel}) to each subscriber (message sent to \cell{forwardMessage} by \cell{subscribers.each}).
+
+\subsubsection{Execution}
+
+The two \cell{parent} references (abbreviated with $\rho$) in the reaction of \cell{forwardMessage} are necessary because the reaction does not execute in the context of the receiver cell but in the context of its execution cell as described in Section \ref{sec:execution}. If cells play the role of methods, executions play the role of their activation records. Unlike activation records, executions do not cease to exist when the reaction completes since executions are accessible from within other executions and due to the asynchronism of message passing they do not become unreachable.
+
+The execution cell is a specialisation of the receiver cell, therefore inherits all of its children and can send them messages as done in the reaction of \cell{Channel}. Thus the first \cell{parent} of \cell{forwardMessage}'s reaction references the \cell{forwardMessage} cell and the second \cell{parent} references the execution of \cell{Channel}'s reaction.
+
+Figure \ref{fig:execution_example} illustrates executions and \cell{message} aliases with a subset of the cells involved in the example application. Executions are depicted as name-less cells which are children and sub-cells of the receiver cell and have a \cell{message} alias as child. In the example, \cell{each} sends a message to its \cell{message} child (see Table \ref{tab:simple_example}) but because of the alias, the message is received by \cell{forwardMessage} (labelled "fm" in the figure). Because the reaction of \cell{forwardMessage} runs within its execution, the channel's message is the \cell{message} child of its execution which is two parents up from \cell{forwardMessage}'s execution.
+
+\figuremacro{execution_example}{Execution cells in the example application}
+{Mailings and resulting execution cells of the simple publish-subscribe system. \textbf{(a)} A publisher sends a message to \cell{Channel} which creates an \textit{execution} with a \cell{message} alias as child. \textbf{(b)} Eventually \cell{forwardMessage} (fm) receives a subscriber as message and creates an execution as well. \textbf{(c)} The execution is a child of \cell{forwardMessage} so the published cell is its parent's parent's message.}
+
+\subsubsection{Usage}
+
+To actually use the system, subscriber cells have to be added to the channel and cells be published. Table \ref{tab:simple_example_usage} contains the definitions of subscribers and the driver cells \cell{Initialize} and \cell{Run}, whose reactions add subscribers to a channel and publish a literal string on it.
+
+\tablemacro{simple_example_usage}{lll}{Usage of simple example application}
+{Definition of subscribers and driver cells to run the publish-subscribe example.}
+{\bf{Cell}    & \bf{Stem} & \bf{Reaction}}
+{subscriber1  & Cell    & Does something with its message\\
+subscriber2   & Cell    & Does something with its message\\
+
+\hline
+
+Initialize    & Cell    & $\circ.Channel.subscribers.add \leftarrow \circ.subscriber1$\\
+              &         & $\circ.Channel.subscribers.add \leftarrow \circ.subscriber2$\\
+Run           & Cell    & $\circ.Channel \leftarrow \circ.Literal.String."Hello World"$\\}
+
+%-----------------------------------------------------
+\subsection{Extended Version}
+\label{sec:example_extended}
+
+In this section new features are added to the publish-subscribe system of the previous section to illustrate further concepts of the software platform. In the extended version of the application, a subscriber cell can influence whether it receives a published cell or not. This is done by adding subscriptions to a channel which contain logic to decide for each published cell whether its subscriber is interested in it or not. When a new cell is published, the channel sends it first to each subscription and only forwards it to the subscriber if the subscription replies positively.
+
+\subsubsection{Responses}
+
+Because message passing is asynchronous, a sender that expects a response has to send a cell along with the message that the receiver can respond to. This is done by creating a \textit{container} cell which specializes the actual message. By convention, the cell that the response is expected to be sent to is a child of the container named \cell{respond}.
+
+Figure \ref{fig:responses} compares mailings (a) without and (b) with response. In the first case, \cell{A} sends \cell{M} to \cell{B} which cannot send any message as response since it has no information about \cell{A}. It could send a response to \cell{M} but if the same cell is sent more than once a correlation between messages and responses would be impossible. For this reason, \cell{A} sends a unique container cell \cell{C} (letter I in Figure \ref{fig:responses} (b)) which specializes \cell{M} and contains a cell \cell{R}, to which \cell{B} sends its response message (letter II).
+
+\figuremacro{responses}{Mailing without and with response}
+{Cells involved in mailing (a) without and (b) with response.}
+
+\subsubsection{Definition}
+
+The involved cells are defined in Table \ref{tab:extended_example}, which also contains the definitions of further library cells needed by the example. These definitions are complementary to previous definitions.
+
+\tablemacro{extended_example}{lll}{Cell definition of extended example}
+{Cell definitions of extended publish-subscribe example application.}
+{\bf{Cell}                    & \bf{Stem} & \bf{Reaction}}
+{Channel                      & Cell & $subscribers.each \leftarrow forwardMessage$\\
+\texttt{|}                    &      & $subscriptions.each \leftarrow askSubscription$\\
+\texttt{|\_} subscriptions    & List \\
+\texttt{|\_} askSubscription  & Cell & $cell.create.wants \leftarrow \parent.\parent.message$\\
+\texttt{  |}                  &      & $message \leftarrow wants$\\
+\texttt{  |}                  &      & $wants.response.ifTrue \leftarrow forwardMessage$\\
+\texttt{  |\_} forwardMessage & Cell & $\parent.\parent.message.subscriber \leftarrow \parent.\parent.\parent.message$\\
+Subscription                  & Cell & $message.respond \leftarrow \circ.True$\\
+
+\hline
+
+Cell                          & Cell\\
+\texttt{|\_} respond          & Cell & $\parent.\parent.cell.create.response \leftarrow message$\\
+True                          & Cell \\
+\texttt{|\_} ifTrue           & Cell & $message \leftarrow \circ$\\
+False                         & Cell \\
+\texttt{|\_} ifTrue           & Cell & does nothing\\}
+
+The first definition extends the reaction of \cell{Channel} by a second instruction which iterates through the \cell{subscriptions} list (second definition) by sending the channel's child \cell{askSubscription} to its child \cell{each}.
+
+The third definition contains the reaction of \cell{askSubscription} to which all the subscriptions of the channel are sent individually as messages by \cell{each}. The first instruction creates a new cell named \cell{wants} with the published cell (\cell{message} of the channel) as its stem. The new child is sent to the received subscription in the second instruction.
+
+The new cell is created using \cell{cell.create} which is implemented on the kernel level and has an infinite number of children that create cells with their own name and the received message as stem. Note that \cell{wants} is created as a child of the execution cell and not of \cell{askSubscription}. In this case, the execution serves as a local name-space just like activation records. This way executions created by further subscriptions sent to \cell{askSubscription} are able to create their own \cell{wants} children without conflicting with other executions.
+
+The child \cell{wants} plays the role of the before mentioned container cell which is necessary because it contains \cell{respond} (inherited by \cell{Cell}) which will receive the response. The reaction of \cell{respond} creates a cell named \cell{response} in the receiver's parent with the received cell as its stem.
+
+This behaviour is used by a feature of the programming model called \textit{data flow synchronization} which is described in Section \ref{sec:delivery}. The third instruction of \cell{askSubscription}'s reaction sends a message to a child of \cell{wants.response}. This cell does not exist before \cell{wants.respond} has received a message. The instruction can still be executed because in the case of a non-existent receiver, a mailing is repeated until its message is delivered. This enables instructions to be processed before all of their required information is available.
+
+The same instruction is also an example of library-based control structures. The reaction of \cell{forwardMessage} is only executed if the response is a sub-cell of \cell{True} since only \cell{True} defines a reaction for its \cell{ifTrue} child.
+
+The last definition for the system is a prototype of \cell{Subscription} which provides a default reaction by responding with \cell{$\circ$.True}.
+
+\subsubsection{Usage}
+
+As in the previous section, driver cells are needed in order to run the application. The cells defined in Table \ref{tab:extended_example_usage} create two channels by specializing \cell{Channel} and two subscriptions for \cell{subscriber1} of the previous example. The first subscription inherits the default reaction from its stem cell \cell{Subscription} and the second subscription executes its stem cell's reaction explicitly by forwarding its \cell{message} to its child \cell{stem} which works like \textit{super} in conventional object-oriented languages. And as before, cells are defined to initialize and run the example.
+
+\tablemacro{extended_example_usage}{lll}{Usage of extended example application}
+{Definition of channels, subscribers and driver cells to run the extended publish-subscribe example.}
+{\bf{Cell}               & \bf{Stem} & \bf{Reaction}}
+{channel1                & Channel      \\
+channel2                 & Channel      \\
+subscription1            & Subscription \\
+\texttt{|\_} subscriber  & subscriber1  \\
+subscription2            & Subscription & $\parent.stem \leftarrow message$\\
+\texttt{|\_} subscriber  & subscriber1  \\
+\hline
+Initialize               & Cell         & $\circ.channel1.subscriptions.add \leftarrow \circ.subscription1$\\
+                         &              & $\circ.channel2.subscriptions.add \leftarrow \circ.subscription2$\\
+Run                      & Cell         & $\circ.channel1 \leftarrow \circ.Literal.String."Hello World"$\\
+                         &              & $\circ.channel2 \leftarrow \circ.Literal.String."Hello World"$}
+
+%-----------------------------------------------------
+%-----------------------------------------------------
+\section{Implementation}
+\label{sec:implementation}
+
+This section describes the implementation of the object model, how mailings are processed, cell paths bound to executions and other functional parts that derive directly from the programming model. Parts of the implementation regarding the environment of the software platform such as storage, distribution, reflection and libraries are described in the next chapter.
+
+%-----------------------------------------------------
+\subsection{Object Model}
+
+The class diagram in Figure \ref{fig:class_diagram} shows the classes and their associations used to implement the object model described in Section \ref{sec:concepts}. Each class is described roughly in the following list and their functionality in the following sections.
+
+\figuremacro{class_diagram}{Class diagram of object model}{Class diagram of object model.}
+
+\begin{description}
+\item[Cell]{Implements compositional cell hierarchies with each instance referencing its parent and children objects. The tree may be incomplete since children are loaded on-demand but an upwards branch is always completely loaded.}
+
+\item[Deliverer]{Interface for classes that are able to deliver a message such as \code{Cell} and \code{Peer}. The latter is described in Section \ref{sec:distribution}.}
+
+\item[Reaction]{Implements the reaction of the programming model which executes a list of mailings.}
+
+\item[NativeReaction]{An abstract type for reactions that may execute any kind of code. Being able to perform computations without sending messages, subclasses of this class break the otherwise endless recursion of message passing.}
+
+\item[Mailing]{Stores paths of receiver and message cells.}
+
+\item[Path]{Represents a cell path as a list of strings, each string being a cell name.}
+
+\item[Messenger]{Every mailing is delivered by its own messenger instance which spawns a new thread an re-tries sending its message until the delivery returns a positive result.}
+
+\item[Delivery]{Holds parameters which are stacked for nesting deliveries (see Section \ref{sec:inheritance}).}
+
+\item[DeliveryId]{Unique identifier to avoid circular deliveries.}
+
+\item[Result]{Return value of deliveries to determine success and return logged information.}
+
+\item[Execution]{Class of execution cell objects which is created for every received message. Contains local cells and resolves references to its message alias.}
+
+\end{description}
+
+%-----------------------------------------------------
+\subsection{Message Passing}
+
+The reaction of a cell is executed each time the cell receives a message. This is done by invoking the method \code{execute()} which is declared by \code{NativeReaction} and implemented by \code{Reaction}. Listing \ref{lst:reaction_execute} shows the pseudo-code description of the implementation. 
+
+The method processes a list of mailings. First, the \textit{role} of the execution is inserted at the beginning of the receiver and message paths. The role is the path of a cell as resolved during binding. It may differ from a cell's actual path due to inheritance as illustrated in Section \ref{sec:inheritance}. Thus by inserting the role at the beginning of the relative path, it is made absolute. A message is sent using a new instance of \code{Messenger}.
+
+\begin{lstlisting}[mathescape, float=hbt, label=lst:reaction_execute, 
+caption=Execute method of Reaction]
+void execute (receiver, role, message, id) { {
+	foreach (mailing in mailings) {
+		mailing.receiver.insert(0, role);
+		mailing.message.insert(0, role);
+		
+		new Messenger(receiver, mailing, role, id).start();
+	}
+}
+\end{lstlisting}
+
+The class \code{Messenger} spawns a new thread when instantiated in which the message will be re-sent until it is delivered successfully. This is done by the method \code{run()} of \code{Messenger} which is described in Listing \ref{lst:messenger_run}. In this method, a new delivery stack is created with a single delivery containing the role of the execution and the receiver path. A unique delivery identifier is created which is used to detect and avoid endless delivery loops. The resolution of the receiver cell is started by invoking the \code{deliver()} method of the sender cell.
+
+\begin{lstlisting}[mathescape, float=hbt, label=lst:messenger_run, 
+caption=Run method of Messenger]
+void run() {
+	do {
+		if (!pausedAll) {
+			var deliveryStack := new DeliveryStack();
+			deliveryStack.add(new Delivery(role, mailing.receiver));
+
+			var uid := new ExecutionId(eid, sender.count);
+			sender.count := sender.count + 1;
+
+			result := sender.deliver(deliveryStack, mailing.message, uid);
+		}
+	} while (!result.wasDelivered());
+}
+\end{lstlisting}
+
+
+%-----------------------------------------------------
+\subsection{Binding}
+\label{sec:binding}
+
+All references, even those to stem cells and enclosing cells, are late bound. The object model provides the structure for binding the path of a receiver cell to a reaction. This is done recursively by the method \code{deliver()}, defined in the \code{Cell} class. Each invocation of the method resolves a child of the current cell which may be inherited or located on remote sites. Listing \ref{lst:binding_algorithm} contains a pseudo-code description of the \code{deliver()} method.
+
+\begin{lstlisting}[mathescape, float=htbp, label=lst:binding_algorithm, 
+caption=Binding algorithm]
+Result deliver (deliveryStack, message, id) {
+	deliveryStack.popCompletedDeliveries();
+
+	var delivery := deliveryStack.first;
+	var nextCell := nil;
+
+	if (searchedBefore(id, delivery.receiver)) 
+		return new Result();
+
+	if (delivery.receiver.isEmpty()) {
+		if (reaction $\neq$ nil) {
+			executeReacion(message, id, delivery);
+			return new Result().deliveredTo(delivery.role);
+		}
+	} else {
+		nextCell := getNextDeliverer(deliveryStack);
+	}
+
+	if (nextCell = nil) {
+		addToSearchedBefore(id, delivery.receiver);
+		var peerResult := tryPeers(deliveryStack, message, id);
+		if (peerResult.wasDelivered())
+			return peerResult;
+	}
+
+	var inherited := false;
+	if (nextCell = nil and stem $\neq$ nil) {
+		inherited := true;
+		nextCell := this;
+		deliveryStack.push(new Delivery(delivery.role, stem));
+	}
+
+	if (nextCell $\neq$ nil) {
+		var nextResult := nextCell.deliver(deliveryStack, message, id);
+		if (nextResult.wasDelivered()) {
+			if (inherited 
+					and nextResult.deliveredTo.contains(getPath())) {
+				adopt(inheritedPath(nextResult), message, id);
+			}
+			return nextResult;
+		}
+	}
+
+	return new Result();
+}
+\end{lstlisting}
+
+The binding of a receiver path to a reaction begins with the sender cell which is the original receiver. The instance of \code{Messenger} processing the mailing passes the created \code{deliveryStack}, the path of the \code{message} cell and a unique execution identifier (\code{id}) to the \code{delivery()} method of the sender cell object.
+
+The method starts with popping deliveries that have reached their receiver off the stack as explained in more detail in Section \ref{sec:inheritance}. The execution identifier is used in line 7 to avoid endless delivery loops caused by circular structures of stem cells or distributed cells. If a certain receiver was resolved by the same cell in the same delivery before, the resolution step fails by returning an empty \code{Result}.
+
+Lines 10 and 11 check whether the current cell is the receiver and also contains a reaction. If so, the cell's reaction is executed by the auxiliary method \code{executeReaction()} which is described in Section \ref{sec:binding_execution}.
+
+If the current cell is not the receiver, the next cell in the receiver path has to be found. This is done locally in line 16 using \code{getNextDeliverer()}. The method first checks if the next reference is an alias and resolves it as described in Section \ref{sec:aliases}. If it is not an alias, the child is searched for in the list of the cell's own children and returned.
+
+If no next deliverer was found this way, the cell cannot resolve it locally and the delivery is forwarded to distributed parts of the cell by the method \code{tryPeers()}. The method and other details of distribution are described in Section \ref{sec:distribution}. If the receiver was found on a remote system, the delivery returns the positive result in line 23.
+
+Otherwise, line 27 checks whether a next deliverer was found previously. If not, and a stem cell path is defined, the child or reaction is inherited by forwarding the delivery to the stem cell. This is done by pushing a new delivery to the stack as described in Section \ref{sec:inheritance}.
+
+In line 33 the delivery is continued with the next deliverer that was found suitable during the algorithm and a possibly modified delivery stack. If the receiver was successfully inherited and is a child of the current cell, it is adopted in line 38 which is described in Section \ref{sec:adoption}. If no next deliverer was found, nor can the receiver be inherited because no stem cell path is defined, the delivery fails in line 44.
+
+%-----------------------------------------------------
+\subsection{Execution}
+\label{sec:binding_execution}
+
+As described in Section \ref{sec:execution}, the receiver cell does not execute the reaction itself but creates a child cell to do so. This is done by the method \code{executeReaction()} which is invoked in line 12 of Listing \ref{lst:binding_algorithm}. The pseudo-code description of the method is shown in Listing \ref{lst:reaction_execution} . 
+
+\begin{lstlisting}[mathescape, float=htb, label=lst:reaction_execution, 
+caption=Execution of reaction]
+void executeReaction (message, id, delivery) (
+	var executionName := "#" + id;
+	if (delivery.role = getPath()) {
+		addChild(new Execution(this, executionName, message));
+	}
+	delivery.role.add(executionName);
+
+	reaction.execute(this, delivery.role, message, id);
+}
+\end{lstlisting}
+
+The execution cell is created as a child of the receiver with a unique name composed of the delivery identifier. If the current cell was inherited (role does not equal path), the execution is not added and has to be adopted by the inheriting cell which is described in Section \ref{sec:adoption}. The stem cell path of the execution cell is set to \cell{parent} by its constructor. In the last line, the cell's reaction is executed under the context of the execution cell.
+
+The \cell{message} alias of the execution cell is resolved by \code{Execution} by overriding the \code{getNext\-Deliverer()} method as shown in Listing \ref{lst:message_resolution}. The method checks if the next cell to be resolved has the name "message" and if so, removes it from the receiver path and inserts the message cell path instead.
+
+\begin{lstlisting}[mathescape, float=htb, label=lst:message_resolution, 
+caption=Resolution of message alias]
+Cell getNextDeliverer(deliveryStack) {
+	var delivery = deliveryStack.first;
+	var name := delivery.receiver.first;
+
+	if (name = "message") {
+		delivery.receiver.removeFirst();
+		delivery.receiver.insert(0, message);
+		return this;
+	} else {
+		return super.getNextDeliverer(deliveryStack);
+	}
+}
+\end{lstlisting}
+
+%-----------------------------------------------------
+\subsection{Aliases}
+\label{sec:aliases}
+
+In line 16 of the \code{deliver()} method in Listing \ref{lst:binding_algorithm}, the next deliverer is searched for within the current cell by invoking \code{getNextDeliverer()}. The receiver is found if it is either an alias or a child of the cell. Aliases differ from children in their effect on the role of the next deliverer as shown by the pseudo-code description of the \code{getNextDeliverer()} method in Listing \ref{lst:next_deliverer_algorithm}.
+
+First, the method checks the name of the next cell in the receiver path against the three aliases (\cell{$\circ$} (root), \cell{parent} and \cell{self}) and modifies receiver and role paths if a match is found. If the name equals \cell{stem}, the delivery is forwarded to the stem cell but the role is not changed which leads to a behaviour similar to \textit{super} in conventional object-oriented languages. As a last step, the next deliverer is searched within the children of the cell.
+
+\begin{lstlisting}[mathescape, float=htbp, label=lst:next_deliverer_algorithm, 
+caption=Alias and child resolution]
+Cell getNextDeliverer(deliveryStack) {
+	var delivery := deliveryStack.first;
+	var name := delivery.receiver.first;
+	
+	if (name = "$\circ$") {
+		delivery.receiver.removeFirst();
+		delivery.role := createPath("$\circ$");
+		return getRoot();
+
+	} else if (name = "parent") {
+		delivery.receiver.removeFirst();
+		delivery.receiver.insert(delivery.role.subPath(-1));
+		return this;
+
+	} else if (name = "self") {
+		delivery.receiver.removeFirst();
+		return this;
+
+	} else if (name = "stem") {
+		delivery.receiver.removeFirst();
+		deliveryStack.push(createDelivery(delivery.role, stem));
+		return this;
+
+	} else {
+		var child := getChild(name);
+		
+		if (child $\neq$ nil) {
+			delivery.role.add(delivery.receiver.removeFirst());
+			return child;
+		}
+	}
+	
+	return nil;
+}
+\end{lstlisting}
+
+%-----------------------------------------------------
+\subsection{Inheritance}
+\label{sec:inheritance}
+
+Cells are inherited by redirecting the delivery to the cell's stem cell, if defined. Since the stem cell path has to be resolved using a delivery as well, deliveries are stacked to store the role and receiver paths of previous deliveries. When the new delivery reached its receiver (the stem cell), the previous delivery is restored by popping the arrived delivery off the stack (see line 2 in Listing \ref{lst:binding_algorithm}) which results in the stem cell using the role of the inheriting cell.
+
+An example of stacked deliveries is shown in Figure \ref{fig:inheritance} using two levels of inheritance. In the example, a message is sent by the root to the inherited cell \cell{A.X}. The delivery reaches \cell{A} which does not contain \cell{X} but defines \cell{$\circ$.B.D} as its stem cell. To resolve the stem cell, a new delivery is created in Step 3 and pushed on the stack. The stem cell \cell{D} is itself inherited from \cell{C} and therefore requires a third delivery in Step 6. \cell{C} is reached in Step 8 and the nested delivery popped off in Step 9, which restores the role \cell{$\circ$.B} of the inheriting cell. This is repeated for the initial delivery in Step 11, which restores the role of the original receiver so the final role resolves to \cell{$\circ$.A.X}.
+
+\figuremacro{inheritance}{Example of nested deliveries}{Example of nested deliveries during resolution of an inherited cell.}
+
+\subsection{Adoption}
+\label{sec:adoption}
+
+The binding algorithm implements a copy-on-write strategy and creates new children when a message is sent to an inherited cell in order to store the execution cell. This procedure is called \textit{adoption}. Line 3 of Listing \ref{lst:reaction_execution} makes sure that the execution cell is not added to the children of an inherited cell and line 38 of Listing \ref{lst:binding_algorithm} invokes the method \code{adopt()} if a receiver was inherited and is offspring of the current cell.
+
+\sloppy
+Listing \ref{lst:adopt} describes the \code{adopt()} method in pseudo-code. Its argument \code{inherited\-Path} contains the part of the receiver path that was inherited by the current cell. The method iterates trough the path and creates all cells in it as a child of the preceding cell. The stem of each cell is the formerly inherited cell, thus the child with the same name of the parent's stem cell.
+\fussy
+
+\begin{lstlisting}[mathescape, float=htbp, label=lst:adopt, 
+caption=Method to adopt executions of inherited cells]
+void adopt(inheritedPath, message, id) {
+	var cell := this;
+
+	foreach (name in inheritedPath) {
+		var child := new Cell(cell, name);
+
+		var stem := cell.getPath();
+		stem.add("stem", name);
+		child.setStem(stem);
+
+		cell = cell.addChild(child);
+	}
+	
+	cell.addChild(new Execution(cell, eid, message));
+}
+\end{lstlisting}
+
+Figure \ref{fig:adoption} illustrates the adoption of a cell. Because the adopted cell specializes the formerly inherited cell, the local copy only needs to contain the modified information. If for example the reaction of cell \cell{B.E.F} was changed, it still inherits the children from \cell{C.E.F}.
+
+\figuremacro{adoption}{Recursive adoption of an inherited cell}
+{Recursive adoption of a second degree inherited cell.}

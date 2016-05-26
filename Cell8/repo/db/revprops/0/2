@@ -1,0 +1,16 @@
+K 10
+svn:author
+V 8
+NikolasM
+K 8
+svn:date
+V 27
+2011-02-01T10:20:07.031250Z
+K 7
+svn:log
+V 161
+Looks like a good point for an initial commit to save this status
+- GUI mostly working (drag'n'drop missing and poorly tested)
+- Kernel working
+- Library working
+END

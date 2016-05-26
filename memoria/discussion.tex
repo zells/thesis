@@ -1,0 +1,152 @@
+\graphicspath{{figures/discussion/}}
+
+
+% ----------------------- CHAPTER ----------------------
+\chapter{Discussion} 
+
+The following sections discuss the results of this project by comparing it with related works and describing reasons of important design decisions. The last section describes experiences with tests and experiments during the development.
+
+% ----------------------- SECTION ----------------------
+\section{Related Work}
+
+The presented programming model combines many features of related models and languages. Being object-oriented, it is related to Smalltalk \cite{SmalltalkBlueBook, SmalltalkHistory}, C++ \cite{Cpp} and Java \cite{JavaSpecification}. Compared to the hybrid models of C++ and Java, the presented model follows the object-oriented paradigm more consistently. None of these platform are inherently distributed and concurrent although they include frameworks that provide these features.
+
+Newspeak \cite{Newspeak, NewspeakSpecification} extends the semantics of Smalltalk with the ability to nest classes in order to build modules. Its semantics are therefore similar to the presented programming model with the difference that there is no global address space in Newspeak and like Smalltalk it is not distributed.
+
+A prominent programming model which is closely related to the presented one is the actor model \cite{ActorsAgha, ActorsHewitt}. In fact, the presented software platform can be seen as an implementation of the actor model with cells playing the role of actors. Like actors, cells are distributed, thus inherently concurrent and use asynchronous messages for communication. Unlike actors, cells do not use a \textit{become} primitive to change their behaviour since it conflicts with the use of inheritance \cite{ActorInheritance}.
+
+The currently most successful implementation of the actor model is the Erlang programming language \cite{ErlangBook, ErlangHistory}. The main differences with Erlang is that the proposed model does not buffer messages in mailboxes and uses a higher level of abstraction with a single kind of entity compared to Erlang's variety of control and data structures. Since the proposed model does not specify a high level programming language, a functional language similar to Erlang could be used, although an imperative language fits more naturally to an object-oriented model.
+
+Another implementation of the actor model is the experimental programming language Act 1 \cite{Act1Parallelism}. It shares the radical view of "everything is an actor" with the proposed model thus data types, procedures as well as messages are actors. Besides a different approach to distribution and name resolution, the main difference is that Act 1 uses pattern matching to bind messages to message handlers.
+
+The programming language Oz (as used in \cite{ConceptsOfProgramming}) uses a distributed and concurrent model as well and also data flow variables. But unlike the proposed model, Oz is not inherently object-oriented and thus does not include the concepts of specialization and inheritance, although they can be added.
+
+Self \cite{Self} is known for its consistent use of prototype objects instead of classes but new objects are created as copies of prototypes and not as specializations. Also, Self is not distributed. Its model of activation records is very similar since activations are modelled as specializations of the receiving entity but the fact is hidden from the user by the special receiver "self" which behaves differently depending on if a message is sent to it directly or to a contained entity.
+
+
+% ----------------------- SECTION ----------------------
+\section{Design Process}
+
+The rapid prototyping approach described in Section \ref{sec:prototyping} led to different designs of components of the programming model during the evolution of the prototypes. This section describes this process in three cases that were object of the majority of revisions.
+
+\subsection{Genesis}
+
+One design principle of the presented programming model is maximizing extensibility by minimizing structure. Therefore, creating new cells should be possible by only relying on the message passing mechanism.
+
+Creating cells by sending messages conflicts in a certain way with the analogy of biological cells used in Section \ref{sec:concepts}, where a new cell would be created in an empty space by specializing an existing cell. The new cell would then be adopted by a parent cell. In practice, it has to be done the other way around since a cell without a parent can not be addressed. Thus it is the parent's responsibility to create a new child.
+
+The initial approach was to send a cell containing the definition of the new cell to the parent cell. This way a cell could be created with a single message. The problem was that the definition cell itself had to be created as well which would lead to an infinite regression of creating definition cell. The regression was broken by \textit{literal} definition cells which similar to literal strings (see Section \ref{sec:library}) can be addressed as the child of a native cell. The name of this child is then used by the literal definition as name for the new cell.
+
+Although the approach was working, it required a lot of library support and duplicated all cell definitions. It was therefore discarded in favour of an approach using reflection cells. The cell \cell{Children} represents the children of a cell as a list of strings. Cells can be created and deleted by simply modifying this list. The advantage is that the same structure can be used for reading and modification without redundancy.
+
+Another problem with cell genesis is timing. Since all mailings of a reaction are sent concurrently, messages sent to a new cell might be sent before the cell was created. The first approach to use continuations for synchronization was no feasible because continuations are cells which have to be created first as well. The problem was eventually solved by introducing data flow synchronization and an activation state which allows a cell to be created and defined before it is activated as described in Section \ref{sec:delivery}. 
+
+\subsection{Responses}
+
+Due to the asynchronism of message passing, messages which expect a response have to contain a resumption cell that the receiver can send the response to. As described in Section \ref{sec:example_extended}, the current solution is to create a specialisation of the actual message cell which contains the resumption cell as child. The disadvantage of this approach is the overhead caused by creating a new container cell.
+
+The overhead could be avoided by integrating resumption in the meta structure of mailings. A mailing would then consist of the paths of the receiver, the message and a third path of the resumption cell.
+
+The reasons against making resumption cells part of mailings are rather philosophical. It conflicts with the design principles of minimizing structure and separating meaning from optimization. Not only responses could be integrated into the meta structure but also exceptions and similar constructs, bloating the kernel more than absolutely necessary.
+
+\subsection{Binding \& Context}
+
+Most exploration was done regarding the binding of the receiver cell path to a reaction and its execution. Revised designs and implementations of these central components were therefore the reasons for most new prototypes.
+
+This was caused by the difficulties related to managing the context of each execution in a concurrent, possibly recursive tree of mailings. As Figure \ref{fig:execution_context_tree} demonstrates, a single mailing may lead to the reaction of a cell being executed several times simultaneously. Therefore, the binding algorithm has to keep track of the execution context under which a cell sent a message to the alias \cell{message} or cells which exists only locally within a context. The resolution of these cells depends on the current execution context.
+
+\figuremacro{execution_context_tree}{Contexts in tree of mailings}
+{Contexts in a tree of mailings resulting in reaction of cell \cell{C} being executed simultaneously in two different contexts.}
+
+In a first approach, all information of the current and all preceding mailings was passed to each resolution step which lead to a total of seven parameters, most of them stacked lists to provide nested deliveries (see Section \ref{sec:inheritance}). The overhead was considered necessary to be able to resolve context-dependent children on any host and also to avoid resolution loops caused by circular peer connections.
+
+In a later version, the parameter overhead was reduced by introducing an execution identifier which was unique for every context. It consisted of the identifiers of previous executions in order to provide references to local children of these which where stored in a child of the receiver cell with the identifier as its name. This context child was not addressable directly but only by using the special cell name "context" which was resolved dynamically to the corresponding cell depending on the execution context information. Besides of the still considerable overhead, this approach was discarded since it was inconsistent with the programming model.
+
+As described in Section \ref{sec:example}, the current version reduced the overhead further by storing all execution context information in a specialisation of the receiver cell. Since the reaction is executed by this context dependent cell, no dynamic resolution of a special "context" cell is necessary and the implementation completely consistent with the programming model. Its main disadvantage is the need for the user to be aware of the execution cell in order to address children of parent cells correctly.
+
+The introduction of this \textit{execution} cell also caused a change of the adoption mechanism which is described in Section \ref{sec:adoption}. In earlier versions, a copy-on-change strategy was implemented. Inherited cells were only adopted when explicitly modified by kernel cells. Since this process started at the bottom of the cell tree, it had to be repeated recursively until a not-inherited cell was reached. In the current version, a copy-on-receive strategy is used which leads to more adoptions but each with less overhead.
+
+
+% ----------------------- SECTION ----------------------
+\section{Experience}
+\label{sec:experience}
+
+Besides the unit testing described in Section \ref{sec:tdd}, two test applications were implemented to verify the correctness of the software platform. The two applications are the publish-subscribe system which is already presented in Section \ref{sec:example} and a recursive algorithm to calculate numbers of the Fibonacci sequence which is described in this section. Both applications were implemented as automated tests and manually using the development tools which facilitated debugging considerably.
+
+\subsubsection{Algorithm}
+
+The Fibonacci sequence is defined recursively as $Fib_n = Fib_{n-1} + Fib_{n-2}$ with the two initial values $Fib_0 = 0$ and $Fib_1 = 1$. The definition can be implemented as the recursive algorithm in Listing \ref{lst:fibonacci_algorithm}.
+
+\begin{lstlisting}[mathescape, float=hbt, label=lst:fibonacci_algorithm, 
+caption=Recursive algorithm to calculate a number of the Fibonacci sequence]
+int Fibonacci(index) {
+	if (index = 0 or index = 1) {
+		return index;
+	} else {
+		return Fibonacci(index - 1) + Fibonacci(index - 2);
+	}
+}
+\end{lstlisting}
+
+\subsubsection{Implementation}
+
+This algorithm was chosen as test application because of its extensive use of recursion which involves local data and therefore tests the execution context described in Section \ref{sec:example} thoroughly. In practice, its implementation led to the discovery of several errors which could be identified and fixed with the help of the graphical tools. All of the errors were related to concurrency issues which increases with the index of the calculated number.
+
+Figure \ref{fig:fibonacci} shows the cells defined for the implementation of the algorithm on the presented software platform. The reactions of the cells are presented in the following listings. See Section \ref{sec:library} for descriptions of the used library cells.
+
+\figuremacro{fibonacci}{Cells of Fibonacci applications}
+{Hierarchy of cells involved in the Fibonacci example application.}
+
+To calculate the Fibonacci number with the index $n$, the number is sent to \cell{Fibonacci} as a message. The reaction of \cell{Fibonacci} shown in Listing \ref{lst:fibonacci_fibonacci} creates in lines 1 to 3 a container cell \cell{isOne} which is tested for equality with the received index by being sent to \cell{message.equals}. By sending it to \cell{ifTrue} of the \cell{response}, the reaction of \cell{Fibonacci.respondOne} described in Listing \ref{lst:fibonacci_respond_one} is executed if the message equals the number one. This is repeated in lines 5 to 7 with the number zero and the corresponding cell \cell{Fibonacci.respondZero} whose reaction is shown in Listing \ref{lst:fibonacci_respond_zero}.
+
+\begin{lstlisting}[mathescape, float=hbt, label=lst:fibonacci_fibonacci, 
+caption=Reaction of \cell{Fibonacci} cell]
+$cell.create.isOne~\leftarrow~\circ.Zells.Literal.Number.1$
+$message.equals~\leftarrow~isOne$
+$isOne.response.ifTrue~\leftarrow~respondOne$
+
+$cell.create.isZero~\leftarrow~\circ.Zells.Literal.Number.0$
+$message.equals~\leftarrow~isZero$
+$isZero.response.ifTrue~\leftarrow~respondZero$
+
+$isOne.response.or~\leftarrow~isZero.response$
+$isZero.response.response.ifFalse~\leftarrow~respondSum$
+\end{lstlisting}
+
+\begin{lstlisting}[mathescape, float=htb, label=lst:fibonacci_respond_one, 
+caption=Reaction of \cell{Fibonacci.respondOne} cell]
+$parent.parent.message.respond~\leftarrow~\circ.Zells.Literal.Number.1$
+\end{lstlisting}
+
+\begin{lstlisting}[mathescape, float=htb, label=lst:fibonacci_respond_zero, 
+caption=Reaction of \cell{Fibonacci.respondZero} cell]
+$parent.parent.message.respond~\leftarrow~\circ.Zells.Literal.Number.0$
+\end{lstlisting}
+
+Line 9 of the reaction of \cell{Fibonacci} tests if either the the responses of \cell{isOne} or the response of \cell{isZero} is true. If not, the reaction of \cell{Fibonacci.respondSum} which is given in Listing \ref{lst:fibonacci_respond_sum} is executed in line 10.
+
+\begin{lstlisting}[mathescape, float=hbt, label=lst:fibonacci_respond_sum, 
+caption=Reaction of \cell{Fibonacci.respondSum} cell]
+$cell.create.minusOne~\leftarrow~\circ.Zells.Literal.Number.1$
+$parent.parent.message.subtract~\leftarrow~minusOne$
+$parent.parent.parent~\leftarrow~minusOne.response$
+
+$cell.create.minusTwo~\leftarrow~\circ.Zells.Literal.Number.2$
+$parent.parent.message.subtract~\leftarrow~minusTwo$
+$parent.parent.parent~\leftarrow~minusTwo.response$
+
+$minusOne.response.response.add~\leftarrow~minusTwo.response.response$
+
+$parent.parent.message.respond~\leftarrow~minusTwo.response.response.response$
+\end{lstlisting}
+
+The reaction of \cell{Fibonacci.respondSum} is the implementation of line 5 of the algorithm in Listing \ref{lst:fibonacci_algorithm}. In lines 1 to 3 the index number is subtracted by one and the result sent to \cell{Fibonacci}. This is repeated with the number two in lines 5 to 7. The responses of lines 3 and 7 are added in line 9 whose result is sent to the \cell{respond} child of the original message line 11.
+
+\subsubsection{Measurements}
+
+After implementation, the Fibonacci test application was used to measure execution time and delivery steps. The graph in Figure \ref{fig:benchmark} shows the measured values for the calculation of Fibonacci numbers with different indices. Each value if the average of ten consecutive runs. 
+
+\figuremacro{benchmark}{Benchmark of Fibonacci test application}
+{Measured execution time and invocation of \code{deliver()} for calculations of Fibonacci numbers with different indices.}
+
+The graph shows that the number of invocations of the \code{deliver()} method is the main reason for the increased execution time since the values directly correspond with each other. Thus the performance can be improved by optimizing the binding algorithm for example by caching resolved cells. An approach to improve performance by decreasing delivery steps needed for the resolution of \cell{parent} references led to an performance increase of only five percent.

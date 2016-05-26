@@ -1,0 +1,77 @@
+
+\graphicspath{{figures/graphical_interface/}}
+
+\chapter{Development Tools}
+\label{chap:graphical_interface}
+
+\sloppy
+The prototype implementation of the described software platform is available at http://zells.org. It is built with Java SE 6 and includes graphical development tools for editing, monitoring and analysing distributed cell systems. The following sections describe the usage of the provided tools and their implementation.
+
+%: ------------------------- Section ----------------------
+\section{Description}
+
+\fussy
+The development tools consist of several components to analyse cell systems on different levels. The \textit{message sender} enables the user to send messages to cells transparent to inheritance and location, the \textit{cell browser} edits and shows only actually existing cells and their distribution, the \textit{message inspector} visualizes messages and consecutive messages, and the \textit{delivery analyser} traces the path of individual deliveries. The following subsections describe these components individually.
+
+\subsection{Message Sender}
+
+The main window as shown in Figure \ref{fig:message_sender} consists of a menu and a form to send messages. The menu lets the user load cell systems from folders containing definition files (see Section \ref{sec:storage}, start and stop servers needed for distribution and show the cell browser.
+
+The form can be used to send messages with the root cell as sender. To send a message, the paths of the receiver and message are entered in the corresponding text fields and the button "send" is clicked. All paths are resolved relative to the root.
+
+\figuremacro{message_sender}{Message sender screen shot}
+{Main window and form to send initial messages.}
+
+\subsection{Cell Browser}
+
+The interface also provides a graphical representation of a distributed cell system, a cell browser, which enables the user to browse and modify existing cells, create new cells and select cells for message sending.
+
+Cells can be edited using a context-menu or by dragging it inside another host to copy it, move it or create new peer connections. Figure \ref{fig:cell_browser} shows an exemplary browser with two hosts. Cells can be extended and collapse to show and hide their children, indicated by plus and minus signs on the bottom left corner of each cell. Only actually existing and no inherited cell are shown. Little triangles and circles on the right side indicate defined stem cell paths and reactions respectively.
+
+The darker filling of cell \cell{$\circ$.B.B} in the figure indicates that it is an inactive cell. Inactive cells behave like non-existent but allow to set and change their properties such as name, reaction, stem and children. This way, a cell can be completely defined before it is visible to other cells.
+
+\figuremacro{cell_browser}{Cell browser screen shot}
+{Browser for distributed cell systems.}
+
+Cells are connected directly to corresponding peers on other hosts. These connections are unidirectional, possibly redundant and make all children of the peer and its peers addressable for the cell and all of its children. Peer connections are represented by lines between cells on different hosts with a black circle indicating the direction of the connection. Hosts are identified using the network identifier and the address of the host within this network.
+
+\subsection{Message Inspector}
+
+Every time the message sender (Figure \ref{fig:message_sender}) is used to send a new message, a message inspector opens to show all resulting sends as a tree of mailings. Along with the sender, the receiver and the message, the inspector indicates the current status of each mailing which can be "Sending" if the receiver cell is being resolved, "Waiting" if the receiver cell was not found and the message is re-sent, "Paused", "Cancelled" or "Delivered to ..." as shown in the exemplary message inspector in Figure \ref{fig:message_inspector}.
+
+Sends can be paused, resumed and cancelled individually or paused and resumed globally. This allows the user to freeze the system in order to analyse deliveries as described in the following section.
+
+\figuremacro{message_inspector}{Message inspector screen shot}
+{Message inspector showing a tree of mailings.}
+
+\subsection{Delivery Analyser}
+
+By double-clicking on a mailing in the inspector, a delivery analyser opens and visualizes the delivery's log. The log contains entries for the steps of the name resolution with information about the path of the delivering cell and the delivery parameters for each step as illustrated in Figure \ref{fig:delivery_analyzer}. By clicking on a log entry, the current and all previous delivering cells are highlighted in the cell browser above the log. This way it is easy to follow the path of the name resolution and identify reasons for unsuccessful deliveries.
+
+\figuremacro{delivery_analyzer}{Delivery analyser screen shot}
+{Delivery analyser visualizing a delivery log.}
+
+%: ------------------------- Section ----------------------
+\section{Implementation}
+
+As the kernel, the graphical development tools are implemented using Java SE 6. But since only message passing is used to access the cells, the tools could be implemented using any technology including the presented software platform itself. This section describes how the cell browser uses sending messages to kernel cells (see Section \ref{sec:kernel_cells}) to read and modify properties of distributed cells.
+
+The cell browser needs to be able to access and modify remote cells. This could be done (and was done initially) using remote method calls on the kernel level to directly access \code{Cell} objects. Besides the cost of making all property setters and getters available to remote invocation, this approach also has the disadvantage that it only works with directly reachable cells. But as described in Section \ref{sec:distribution}, cells can be connected indirectly through different networks. In such a case, the connecting cells play the role of inter-network relays and no direct access to the remote methods is possible.
+
+For these two reasons and also because of the increased portability, the browser uses only the message passing mechanism to access all cells, local and remote. Note that the kernel cell \cell{cell.Children} only contains the list of the cell's own, i.e. neither inherited nor distributed children, so the browser only shows actually existing cell.
+
+Another kernel cell \cell{cell.Peers} provides the possibility to disable network transparency. If a message is sent to a cell \cell{A} on host "n:1" is accessed using \cell{A.cell.Peers.n:1}, it is guaranteed to be delivered to the peer on host "n:1" and to no other cell. Also, messages sent to children of \cell{A} using this path are only delivered to children on the given host.
+
+The cell browser loads and accesses child cells incrementally during browsing. The properties of each cell are read when the cell is loaded including peer connections which leads to an incremental discovery of new hosts. Figure \ref{fig:peer_discovery} illustrates this process in three exemplary steps. 
+
+\begin{description}
+\item[Step (a)]{shows a new browser instance with the local host containing the cell \cell{A}.}
+
+\item[In step (b)]{\cell{A} is expanded and its child \cell{B} loaded which has one peer connection with host "1" on network "n". The path to access the peer is therefore \cell{A.B.cell.Peers.n:1}. Its parent cell \cell{A} is assumed but cannot be accessed since no connection exists.}
+
+\item[In step (c)]{Cell \cell{A.B} on host "n:1" is expended, loading its child \cell{C} which has a peer connection with host "A" on network "m". The new peer is accessed using the path \cell{A.B.cell.Peers.n:1.C.m:A}. As before, its parent cells can be assumed but not accessed. Note that the local host has no access to network "m" so the only way to reach cell \cell{C} on host "m:A" is over cell \cell{B} on host "n:1".}
+
+\end{description}
+
+\figuremacro{peer_discovery}{Discovery of hosts in cell browser}
+{Discovery of peers on new hosts and their implicit parents in cell browser. \textbf{(a)} A new cell browser showing one cell in local cell hierarchy. \textbf{(b)} Cell \cell{A} is expanded, its child \cell{B} has a connection with its peer on host "n:1". \textbf{(c)} A new peer is discovered on host "m:A".}

@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<editmodel:ClassDiagramEditModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:editmodel="editmodel.xmi" xmlns:options="options.xmi" name="org.rtens.cellClassDiagram_1" foregroundRGB="255,255,255" fontInfo="Omondo_Font_Default-8-0" id="{UMLID=_UN4BAu10Ed-tjPs0XGx_jA,JavaID=org.rtens.cell}" metadata="uml2-1.0" initialized="true" scrolledX="-24" scrolledY="-21" tag="100" key="32303037303632392043656C6C34" showNonNavigableMutiplicity="false">
+  <children xsi:type="editmodel:ClassEditModel" name="Result" location="504,127" size="250,128" timstampe="733" stereotype="" id="{UMLID=_ZByxEO12Ed-tjPs0XGx_jA,JavaID=org.rtens.cell/Result}" packageIndication="2" runTimeClassModel="getReceiver(),proposeHeir(Lorg.rtens.cell.Address;Lorg.rtens.cell.Parameters;),deliveredTo(Lorg.rtens.cell.Address;Lorg.rtens.cell.Path;),wasDelivered(),hasHeir(),toString()">
+    <children xsi:type="editmodel:CompartmentEditModel"/>
+    <children xsi:type="editmodel:CompartmentEditModel" size="228,112">
+      <children xsi:type="editmodel:MethodEditModel" name="wasDelivered" size="141,14" id="{UMLID=_yS2BwO16Ed-tjPs0XGx_jA,JavaID=org.rtens.cell/Result#wasDelivered()}"/>
+      <children xsi:type="editmodel:MethodEditModel" name="getReceiver" size="136,14" id="{UMLID=_ySs30u16Ed-tjPs0XGx_jA,JavaID=org.rtens.cell/Result#getReceiver()}"/>
+      <children xsi:type="editmodel:MethodEditModel" name="proposeHeir" size="228,14" id="{UMLID=_ySZV0e16Ed-tjPs0XGx_jA,JavaID=org.rtens.cell/Result#proposeHeir(Lorg.rtens.cell.Address;Lorg.rtens.cell.Parameters;)}"/>
+      <children xsi:type="editmodel:MethodEditModel" name="deliveredTo" size="191,14" id="{UMLID=_yS2Bw-16Ed-tjPs0XGx_jA,JavaID=org.rtens.cell/Result#deliveredTo(Lorg.rtens.cell.Address;Lorg.rtens.cell.Path;)}"/>
+      <children xsi:type="editmodel:MethodEditModel" name="hasHeir" size="111,14" id="{UMLID=_ySjG0u16Ed-tjPs0XGx_jA,JavaID=org.rtens.cell/Result#hasHeir()}"/>
+    </children>
+    <children xsi:type="editmodel:CompartmentEditModel"/>
+    <sourceConnections xsi:type="editmodel:AssociationEditModel" autoLocated="true" id="{UMLID=_yZs3tu16Ed-tjPs0XGx_jA}" source="//@children.0" target="//@children.1" targetEnd="//@children.0/@sourceConnections.0/@children.2" label="//@children.0/@sourceConnections.0/@children.0" sourceEnd="//@children.0/@sourceConnections.0/@children.1" connectionRouterKind="Manhattan">
+      <children xsi:type="editmodel:WireLabelEditModel" size="0,14" fontInfo="Arial-8-0" anchorKind="MiddlePart"/>
+      <children xsi:type="editmodel:AssociationEndEditModel" name="ownedEnd" location="0,35" id="{UMLID=_yZs3t-16Ed-tjPs0XGx_jA}" attachSource="true" flags="1"/>
+      <children xsi:type="editmodel:AssociationEndEditModel" name="heirsParams" location="162,92" id="{UMLID=_ySQL4u16Ed-tjPs0XGx_jA}" multiplicityLabel="//@children.0/@sourceConnections.0/@children.2/@children.0" roleLabel="//@children.0/@sourceConnections.0/@children.2/@children.1" navigable="true" flags="1">
+        <children xsi:type="editmodel:LabelEditModel" name="1" location="155,169" size="6,14" fontInfo="Arial-8-0" anchorKind="LastPart"/>
+        <children xsi:type="editmodel:LabelEditModel" name="+ heirsParams" location="155,141" size="69,14" fontInfo="Arial-8-0" anchorKind="LastPart"/>
+      </children>
+    </sourceConnections>
+    <sourceConnections xsi:type="editmodel:AssociationEditModel" id="{UMLID=_yZs3uO16Ed-tjPs0XGx_jA}" source="//@children.0" target="//@children.3" targetEnd="//@children.0/@sourceConnections.1/@children.2" label="//@children.0/@sourceConnections.1/@children.0" sourceEnd="//@children.0/@sourceConnections.1/@children.1" connectionRouterKind="Manhattan">
+      <children xsi:type="editmodel:WireLabelEditModel" size="0,14" fontInfo="Arial-8-0" anchorKind="MiddlePart"/>
+      <children xsi:type="editmodel:AssociationEndEditModel" name="ownedEnd" location="218,0" id="{UMLID=_yZs3ue16Ed-tjPs0XGx_jA}" attachSource="true" flags="1"/>
+      <children xsi:type="editmodel:AssociationEndEditModel" name="searched" location="180,44" id="{UMLID=_ySQL6O16Ed-tjPs0XGx_jA}" multiplicityLabel="//@children.0/@sourceConnections.1/@children.2/@children.0" roleLabel="//@children.0/@sourceConnections.1/@children.2/@children.1" navigable="true" flags="1">
+        <children xsi:type="editmodel:LabelEditModel" name="1" location="692,79" size="6,14" fontInfo="Arial-8-0" anchorKind="LastPart"/>
+        <children xsi:type="editmodel:LabelEditModel" name="+ searched" location="692,51" size="55,14" fontInfo="Arial-8-0" anchorKind="LastPart"/>
+      </children>
+    </sourceConnections>
+    <sourceConnections xsi:type="editmodel:AssociationEditModel" id="{UMLID=_yZs3uu16Ed-tjPs0XGx_jA}" source="//@children.0" target="//@children.7" targetEnd="//@children.0/@sourceConnections.2/@children.2" label="//@children.0/@sourceConnections.2/@children.0" sourceEnd="//@children.0/@sourceConnections.2/@children.1" connectionRouterKind="Manhattan">
+      <children xsi:type="editmodel:WireLabelEditModel" size="0,14" fontInfo="Arial-8-0" anchorKind="MiddlePart"/>
+      <children xsi:type="editmodel:AssociationEndEditModel" name="ownedEnd" location="221,128" id="{UMLID=_yZs3u-16Ed-tjPs0XGx_jA}" attachSource="true" flags="1"/>
+      <children xsi:type="editmodel:AssociationEndEditModel" name="log" location="123,34" id="{UMLID=_ySQL5u16Ed-tjPs0XGx_jA}" multiplicityLabel="//@children.0/@sourceConnections.2/@children.2/@children.0" roleLabel="//@children.0/@sourceConnections.2/@children.2/@children.1" navigable="true" flags="1">
+        <children xsi:type="editmodel:LabelEditModel" name="1" location="634,286" size="6,14" fontInfo="Arial-8-0" anchorKind="LastPart"/>
+        <children xsi:type="editmodel:LabelEditModel" name="+ log" location="634,314" size="23,14" fontInfo="Arial-8-0" anchorKind="LastPart"/>
+      </children>
+    </sourceConnections>
+    <sourceConnections xsi:type="editmodel:AssociationEditModel" id="{UMLID=_yZs3sO16Ed-tjPs0XGx_jA}" source="//@children.0" target="//@children.4" targetEnd="//@children.0/@sourceConnections.3/@children.2" label="//@children.0/@sourceConnections.3/@children.0" sourceEnd="//@children.0/@sourceConnections.3/@children.1" connectionRouterKind="Manhattan">
+      <children xsi:type="editmodel:WireLabelEditModel" size="0,14" fontInfo="Arial-8-0" anchorKind="MiddlePart"/>
+      <children xsi:type="editmodel:AssociationEndEditModel" name="ownedEnd" location="0,48" id="{UMLID=_yZs3se16Ed-tjPs0XGx_jA}" attachSource="true" flags="1"/>
+      <children xsi:type="editmodel:AssociationEndEditModel" name="receivedAddress" location="73,0" id="{UMLID=_ySQL4O16Ed-tjPs0XGx_jA}" multiplicityLabel="//@children.0/@sourceConnections.3/@children.2/@children.0" roleLabel="//@children.0/@sourceConnections.3/@children.2/@children.1" navigable="true" flags="1">
+        <children xsi:type="editmodel:LabelEditModel" name="1" location="394,190" size="6,14" fontInfo="Arial-8-0" anchorKind="LastPart"/>
+        <children xsi:type="editmodel:LabelEditModel" name="+ receivedAddress" location="287,190" size="93,14" fontInfo="Arial-8-0" anchorKind="LastPart"/>
+      </children>
+    </sourceConnections>
+    <sourceConnections xsi:type="editmodel:AssociationEditModel" id="{UMLID=_yZs3tO16Ed-tjPs0XGx_jA}" source="//@children.0" target="//@children.4" targetEnd="//@children.0/@sourceConnections.4/@children.2" label="//@children.0/@sourceConnections.4/@children.0" sourceEnd="//@children.0/@sourceConnections.4/@children.1" connectionRouterKind="Manhattan">
+      <children xsi:type="editmodel:WireLabelEditModel" size="0,14" fontInfo="Arial-8-0" anchorKind="MiddlePart"/>
+      <children xsi:type="editmodel:AssociationEndEditModel" name="ownedEnd" location="0,113" id="{UMLID=_yZs3te16Ed-tjPs0XGx_jA}" attachSource="true" flags="1"/>
+      <children xsi:type="editmodel:AssociationEndEditModel" name="heir" location="96,29" id="{UMLID=_ySQL5O16Ed-tjPs0XGx_jA}" multiplicityLabel="//@children.0/@sourceConnections.4/@children.2/@children.0" roleLabel="//@children.0/@sourceConnections.4/@children.2/@children.1" navigable="true" flags="1">
+        <children xsi:type="editmodel:LabelEditModel" name="1" location="417,247" size="6,14" fontInfo="Arial-8-0" anchorKind="LastPart"/>
+        <children xsi:type="editmodel:LabelEditModel" name="+ heir" location="417,219" size="27,14" fontInfo="Arial-8-0" anchorKind="LastPart"/>
+      </children>
+    </sourceConnections>
+    <sourceConnections xsi:type="editmodel:AssociationEditModel" id="{UMLID=_yZs3su16Ed-tjPs0XGx_jA}" source="//@children.0" target="//@children.6" targetEnd="//@children.0/@sourceConnections.5/@children.2" label="//@children.0/@sourceConnections.5/@children.0" sourceEnd="//@children.0/@sourceConnections.5/@children.1" connectionRouterKind="Manhattan">
+      <children xsi:type="editmodel:WireLabelEditModel" size="0,14" fontInfo="Arial-8-0" anchorKind="MiddlePart"/>
+      <children xsi:type="editmodel:AssociationEndEditModel" name="ownedEnd" location="16,0" id="{UMLID=_yZs3s-16Ed-tjPs0XGx_jA}" attachSource="true" flags="1"/>
+      <children xsi:type="editmodel:AssociationEndEditModel" name="resolvedReceiver" location="100,102" id="{UMLID=_ySGa4O16Ed-tjPs0XGx_jA}" multiplicityLabel="//@children.0/@sourceConnections.5/@children.2/@children.0" roleLabel="//@children.0/@sourceConnections.5/@children.2/@children.1" navigable="true" flags="1">
+        <children xsi:type="editmodel:LabelEditModel" name="1" location="417,124" size="6,14" fontInfo="Arial-8-0" anchorKind="LastPart"/>
+        <children xsi:type="editmodel:LabelEditModel" name="+ resolvedReceiver" location="417,96" size="94,14" fontInfo="Arial-8-0" anchorKind="LastPart"/>
+      </children>
+    </sourceConnections>
+    <classifierPreferences xsi:type="editmodel:UMLClassDiagramClassifierPreference" showMethodsParameterTypes="true" showMethodsReturnType="true" attributeSorter="Natural" methodSorter="Natural" innerClassSorter="Natural" showPrivateAttributes="true" showProtectedAttributes="true" showPublicAttributes="true" showPackageAttributes="true" showStaticAttributes="true" showProtectedMethods="true" showPublicMethods="true" showPackageMethods="true" showStaticMethods="true" showProtectedInnerClasses="true" showPublicInnerClasses="true" showPackageInnerClasses="true" showPrivateInnerClasses="true" showStaticInnerClasses="true" packageIndication="2" showAssociationMember="false" showMethods="true" showAttributes="true" showLiterals="true" ShowInnerEntity="true" showAttributeParameterType="true" showMethodAssociationMember="false" showAccessorsMember="false"/>
+  </children>
+  <children xsi:type="editmodel:ClassEditModel" targetConnections="//@children.0/@sourceConnections.0" name="Parameters" location="-14,70" size="162,128" timstampe="1330" stereotype="" id="{UMLID=_ZAmeQO12Ed-tjPs0XGx_jA,JavaID=org.rtens.cell/Parameters}" packageIndication="2" runTimeClassModel="contextStack,receiverStack,send,steps,org.rtens.cell.Parameters.SearchEntry,Parameters(Lorg.rtens.cell.Parameters;),toString(),copyPathStack(Lorg.rtens.cell.Path;),Parameters(),address,searchedStems,popStacks(),searched,resolvedStack,copyContextStack(Lorg.rtens.cell.Context;),popStack(Ljava.lang.Object;)">
+    <children xsi:type="editmodel:CompartmentEditModel" size="81,16">
+      <children xsi:type="editmodel:AttributeEditModel" name="steps" size="81,14" id="{UMLID=_0Pt-Je16Ed-tjPs0XGx_jA}"/>
+    </children>
+    <children xsi:type="editmodel:CompartmentEditModel" size="316,112">
+      <children xsi:type="editmodel:MethodEditModel" name="Parameters" size="85,14" id="{UMLID=_0QT0BO16Ed-tjPs0XGx_jA,JavaID=org.rtens.cell/Parameters#Parameters()}"/>
+      <children xsi:type="editmodel:MethodEditModel" name="Parameters" size="140,14" id="{UMLID=_0QKqEe16Ed-tjPs0XGx_jA,JavaID=org.rtens.cell/Parameters#Parameters(Lorg.rtens.cell.Parameters;)}"/>
+      <children xsi:type="editmodel:MethodEditModel" name="toString" size="101,14" id="{UMLID=_0QT0Be16Ed-tjPs0XGx_jA,JavaID=org.rtens.cell/Parameters#toString()}"/>
+      <children xsi:type="editmodel:MethodEditModel" name="popStacks" size="81,14" id="{UMLID=_0QdlAu16Ed-tjPs0XGx_jA,JavaID=org.rtens.cell/Parameters#popStacks()}"/>
+    </children>
+    <children xsi:type="editmodel:CompartmentEditModel" size="99,30"/>
+    <sourceConnections xsi:type="editmodel:AssociationEditModel" autoLocated="true" id="{UMLID=_0Y9Zsu16Ed-tjPs0XGx_jA}" source="//@children.1" target="//@children.5" targetEnd="//@children.1/@sourceConnections.0/@children.2" label="//@children.1/@sourceConnections.0/@children.0" sourceEnd="//@children.1/@sourceConnections.0/@children.1" connectionRouterKind="Manhattan">
+      <children xsi:type="editmodel:WireLabelEditModel" size="0,14" fontInfo="Arial-8-0" anchorKind="MiddlePart"/>
+      <children xsi:type="editmodel:AssociationEndEditModel" name="ownedEnd" location="35,0" id="{UMLID=_0Y9Zs-16Ed-tjPs0XGx_jA}" attachSource="true" flags="1"/>
+      <children xsi:type="editmodel:AssociationEndEditModel" name="contextStack" location="35,28" id="{UMLID=_0PkNIO16Ed-tjPs0XGx_jA}" multiplicityLabel="//@children.1/@sourceConnections.0/@children.2/@children.0" roleLabel="//@children.1/@sourceConnections.0/@children.2/@children.1" navigable="true" flags="1">
+        <children xsi:type="editmodel:LabelEditModel" name="1..*" location="-2,36" size="16,14" fontInfo="Arial-8-0" anchorKind="LastPart"/>
+        <children xsi:type="editmodel:LabelEditModel" name="+ contextStack" location="28,36" size="72,14" fontInfo="Arial-8-0" anchorKind="LastPart"/>
+      </children>
+    </sourceConnections>
+    <sourceConnections xsi:type="editmodel:AssociationEditModel" id="{UMLID=_fTm28O2CEd-tjPs0XGx_jA}" source="//@children.1" target="//@children.8" targetEnd="//@children.1/@sourceConnections.1/@children.2" label="//@children.1/@sourceConnections.1/@children.0" sourceEnd="//@children.1/@sourceConnections.1/@children.1" connectionRouterKind="Manhattan">
+      <children xsi:type="editmodel:WireLabelEditModel" size="0,14" fontInfo="Arial-8-0" anchorKind="MiddlePart"/>
+      <children xsi:type="editmodel:AssociationEndEditModel" name="parameters" location="136,127" id="{UMLID=_fTBBFO2CEd-tjPs0XGx_jA}" attachSource="true" multiplicityLabel="//@children.1/@sourceConnections.1/@children.1/@children.0" roleLabel="//@children.1/@sourceConnections.1/@children.1/@children.1" navigable="true" flags="1">
+        <children xsi:type="editmodel:LabelEditModel" name="1" location="109,205" size="6,14" fontInfo="Arial-8-0" anchorKind="FirstPart"/>
+        <children xsi:type="editmodel:LabelEditModel" name="+ parameters" location="129,205" size="64,14" fontInfo="Arial-8-0" anchorKind="FirstPart"/>
+      </children>
+      <children xsi:type="editmodel:AssociationEndEditModel" name="ownedEnd" location="80,-1" id="{UMLID=_fTm28e2CEd-tjPs0XGx_jA}" flags="1"/>
+    </sourceConnections>
+    <sourceConnections xsi:type="editmodel:AssociationEditModel" id="{UMLID=_0YzosO16Ed-tjPs0XGx_jA}" source="//@children.1" target="//@children.2" targetEnd="//@children.1/@sourceConnections.2/@children.2" label="//@children.1/@sourceConnections.2/@children.0" sourceEnd="//@children.1/@sourceConnections.2/@children.1" connectionRouterKind="Manhattan">
+      <children xsi:type="editmodel:WireLabelEditModel" size="0,14" fontInfo="Arial-8-0" anchorKind="MiddlePart"/>
+      <children xsi:type="editmodel:AssociationEndEditModel" name="ownedEnd" location="88,127" id="{UMLID=_0Yzose16Ed-tjPs0XGx_jA}" attachSource="true" flags="1"/>
+      <children xsi:type="editmodel:AssociationEndEditModel" name="send" location="54,9" id="{UMLID=_0PkNJO16Ed-tjPs0XGx_jA}" multiplicityLabel="//@children.1/@sourceConnections.2/@children.2/@children.0" roleLabel="//@children.1/@sourceConnections.2/@children.2/@children.1" navigable="true" flags="1">
+        <children xsi:type="editmodel:LabelEditModel" name="1" location="48,199" size="6,14" fontInfo="Arial-8-0" anchorKind="LastPart"/>
+        <children xsi:type="editmodel:LabelEditModel" name="+ send" location="48,227" size="33,14" fontInfo="Arial-8-0" anchorKind="LastPart"/>
+      </children>
+    </sourceConnections>
+    <sourceConnections xsi:type="editmodel:AssociationEditModel" id="{UMLID=_0Y9Ztu16Ed-tjPs0XGx_jA}" source="//@children.1" target="//@children.6" targetEnd="//@children.1/@sourceConnections.3/@children.2" label="//@children.1/@sourceConnections.3/@children.0" sourceEnd="//@children.1/@sourceConnections.3/@children.1" connectionRouterKind="Manhattan">
+      <children xsi:type="editmodel:WireLabelEditModel" size="0,14" fontInfo="Arial-8-0" anchorKind="MiddlePart"/>
+      <children xsi:type="editmodel:AssociationEndEditModel" name="ownedEnd" location="162,12" id="{UMLID=_0Y9Zt-16Ed-tjPs0XGx_jA}" attachSource="true" flags="1"/>
+      <children xsi:type="editmodel:AssociationEndEditModel" name="searchedStems" location="0,67" id="{UMLID=_0Pt-I-16Ed-tjPs0XGx_jA}" multiplicityLabel="//@children.1/@sourceConnections.3/@children.2/@children.0" roleLabel="//@children.1/@sourceConnections.3/@children.2/@children.1" navigable="true" flags="1">
+        <children xsi:type="editmodel:LabelEditModel" name="1..*" location="287,89" size="16,14" fontInfo="Arial-8-0" anchorKind="LastPart"/>
+        <children xsi:type="editmodel:LabelEditModel" name="+ searchedStems" location="218,61" size="85,14" fontInfo="Arial-8-0" anchorKind="LastPart"/>
+      </children>
+    </sourceConnections>
+    <sourceConnections xsi:type="editmodel:AssociationEditModel" id="{UMLID=_0Yzosu16Ed-tjPs0XGx_jA}" source="//@children.1" target="//@children.6" targetEnd="//@children.1/@sourceConnections.4/@children.2" label="//@children.1/@sourceConnections.4/@children.0" sourceEnd="//@children.1/@sourceConnections.4/@children.1" connectionRouterKind="Manhattan">
+      <children xsi:type="editmodel:WireLabelEditModel" size="0,14" fontInfo="Arial-8-0" anchorKind="MiddlePart"/>
+      <children xsi:type="editmodel:AssociationEndEditModel" name="ownedEnd" location="162,56" id="{UMLID=_0Yzos-16Ed-tjPs0XGx_jA}" attachSource="true" flags="1"/>
+      <children xsi:type="editmodel:AssociationEndEditModel" name="resolvedStack" location="0,111" id="{UMLID=_0P3vIO16Ed-tjPs0XGx_jA}" multiplicityLabel="//@children.1/@sourceConnections.4/@children.2/@children.0" roleLabel="//@children.1/@sourceConnections.4/@children.2/@children.1" navigable="true" flags="1">
+        <children xsi:type="editmodel:LabelEditModel" name="1..*" location="287,133" size="16,14" fontInfo="Arial-8-0" anchorKind="LastPart"/>
+        <children xsi:type="editmodel:LabelEditModel" name="+ resolvedStack" location="225,105" size="78,14" fontInfo="Arial-8-0" anchorKind="LastPart"/>
+      </children>
+    </sourceConnections>
+    <sourceConnections xsi:type="editmodel:AssociationEditModel" id="{UMLID=_0Y9ZuO16Ed-tjPs0XGx_jA}" source="//@children.1" target="//@children.4" targetEnd="//@children.1/@sourceConnections.5/@children.2" label="//@children.1/@sourceConnections.5/@children.0" sourceEnd="//@children.1/@sourceConnections.5/@children.1" connectionRouterKind="Manhattan">
+      <children xsi:type="editmodel:WireLabelEditModel" size="0,14" fontInfo="Arial-8-0" anchorKind="MiddlePart"/>
+      <children xsi:type="editmodel:AssociationEndEditModel" name="ownedEnd" location="162,113" id="{UMLID=_0Y9Zue16Ed-tjPs0XGx_jA}" attachSource="true" flags="1"/>
+      <children xsi:type="editmodel:AssociationEndEditModel" name="address" location="0,24" id="{UMLID=_0Pt-Ie16Ed-tjPs0XGx_jA}" multiplicityLabel="//@children.1/@sourceConnections.5/@children.2/@children.0" roleLabel="//@children.1/@sourceConnections.5/@children.2/@children.1" navigable="true" flags="1">
+        <children xsi:type="editmodel:LabelEditModel" name="1" location="301,214" size="6,14" fontInfo="Arial-8-0" anchorKind="LastPart"/>
+        <children xsi:type="editmodel:LabelEditModel" name="+ address" location="258,242" size="49,14" fontInfo="Arial-8-0" anchorKind="LastPart"/>
+      </children>
+    </sourceConnections>
+    <sourceConnections xsi:type="editmodel:AssociationEditModel" id="{UMLID=_0Y9ZsO16Ed-tjPs0XGx_jA}" source="//@children.1" target="//@children.6" targetEnd="//@children.1/@sourceConnections.6/@children.2" label="//@children.1/@sourceConnections.6/@children.0" sourceEnd="//@children.1/@sourceConnections.6/@children.1" connectionRouterKind="Manhattan">
+      <children xsi:type="editmodel:WireLabelEditModel" size="0,14" fontInfo="Arial-8-0" anchorKind="MiddlePart"/>
+      <children xsi:type="editmodel:AssociationEndEditModel" name="ownedEnd" location="149,0" id="{UMLID=_0Y9Zse16Ed-tjPs0XGx_jA}" attachSource="true" flags="1"/>
+      <children xsi:type="editmodel:AssociationEndEditModel" name="receiverStack" location="0,22" id="{UMLID=_0PkNIu16Ed-tjPs0XGx_jA}" multiplicityLabel="//@children.1/@sourceConnections.6/@children.2/@children.0" roleLabel="//@children.1/@sourceConnections.6/@children.2/@children.1" navigable="true" flags="1">
+        <children xsi:type="editmodel:LabelEditModel" name="1..*" location="287,44" size="16,14" fontInfo="Arial-8-0" anchorKind="LastPart"/>
+        <children xsi:type="editmodel:LabelEditModel" name="+ receiverStack" location="227,16" size="76,14" fontInfo="Arial-8-0" anchorKind="LastPart"/>
+      </children>
+    </sourceConnections>
+    <sourceConnections xsi:type="editmodel:AssociationEditModel" id="{UMLID=_0Y9ZtO16Ed-tjPs0XGx_jA}" source="//@children.1" target="//@children.3" targetEnd="//@children.1/@sourceConnections.7/@children.2" label="//@children.1/@sourceConnections.7/@children.0" sourceEnd="//@children.1/@sourceConnections.7/@children.1" connectionRouterKind="Manhattan">
+      <children xsi:type="editmodel:WireLabelEditModel" size="0,14" fontInfo="Arial-8-0" anchorKind="MiddlePart"/>
+      <children xsi:type="editmodel:AssociationEndEditModel" name="ownedEnd" location="127,0" id="{UMLID=_0Y9Zte16Ed-tjPs0XGx_jA}" attachSource="true" flags="1"/>
+      <children xsi:type="editmodel:AssociationEndEditModel" name="searched" location="34,-1" id="{UMLID=_0Pt-J-16Ed-tjPs0XGx_jA}" multiplicityLabel="//@children.1/@sourceConnections.7/@children.2/@children.0" roleLabel="//@children.1/@sourceConnections.7/@children.2/@children.1" navigable="true" flags="1">
+        <children xsi:type="editmodel:LabelEditModel" name="1..*" location="515,7" size="16,14" fontInfo="Arial-8-0" anchorKind="LastPart"/>
+        <children xsi:type="editmodel:LabelEditModel" name="+ searched" location="545,7" size="55,14" fontInfo="Arial-8-0" anchorKind="LastPart"/>
+      </children>
+    </sourceConnections>
+    <classifierPreferences xsi:type="editmodel:UMLClassDiagramClassifierPreference" showMethodsParameterTypes="true" showMethodsReturnType="true" attributeSorter="Natural" methodSorter="Natural" innerClassSorter="Natural" showPrivateAttributes="true" showProtectedAttributes="true" showPublicAttributes="true" showPackageAttributes="true" showStaticAttributes="true" showProtectedMethods="true" showPublicMethods="true" showPackageMethods="true" showStaticMethods="true" showProtectedInnerClasses="true" showPublicInnerClasses="true" showPackageInnerClasses="true" showPrivateInnerClasses="true" showStaticInnerClasses="true" packageIndication="2" showAssociationMember="false" showMethods="true" showAttributes="true" showLiterals="true" ShowInnerEntity="true" showAttributeParameterType="true" showMethodAssociationMember="false" showAccessorsMember="false"/>
+  </children>
+  <children xsi:type="editmodel:ClassEditModel" targetConnections="//@children.1/@sourceConnections.2" name="Send" location="-14,211" size="55,28" timstampe="231" stereotype="" id="{UMLID=_ZDbv0O12Ed-tjPs0XGx_jA,JavaID=org.rtens.cell/Send}" packageIndication="2" runTimeClassModel="setReceiver(Lorg.rtens.cell.Path;),message,Send(Lorg.rtens.cell.Path;Lorg.rtens.cell.Path;),setMessage(Lorg.rtens.cell.Path;),getReceiver(),receiver,hashCode(),equals(Ljava.lang.Object;),getMessage(),toString()">
+    <children xsi:type="editmodel:CompartmentEditModel"/>
+    <children xsi:type="editmodel:CompartmentEditModel" size="137,128"/>
+    <children xsi:type="editmodel:CompartmentEditModel"/>
+    <classifierPreferences xsi:type="editmodel:UMLClassDiagramClassifierPreference" showMethodsParameterTypes="true" showMethodsReturnType="true" attributeSorter="Natural" methodSorter="Natural" innerClassSorter="Natural" showPrivateAttributes="true" showProtectedAttributes="true" showPublicAttributes="true" showPackageAttributes="true" showStaticAttributes="true" showProtectedMethods="true" showPublicMethods="true" showPackageMethods="true" showPrivateMethods="true" showStaticMethods="true" showProtectedInnerClasses="true" showPublicInnerClasses="true" showPackageInnerClasses="true" showPrivateInnerClasses="true" showStaticInnerClasses="true" packageIndication="2" Minimize="true" showAttributeParameterType="true" showAttributeDefaultValue="true"/>
+  </children>
+  <children xsi:type="editmodel:ClassEditModel" targetConnections="//@children.1/@sourceConnections.7 //@children.0/@sourceConnections.1" name="SearchEntry" location="504,28" size="181,64" timstampe="1330" stereotype="" id="{UMLID=_ZHnFNO12Ed-tjPs0XGx_jA,JavaID=org.rtens.cell/Parameters$SearchEntry}" packageIndication="2" runTimeClassModel="SearchEntry(Lorg.rtens.cell.Address;Lorg.rtens.cell.Path;),address,path,equals(Ljava.lang.Object;),hashCode(),toString()">
+    <children xsi:type="editmodel:CompartmentEditModel"/>
+    <children xsi:type="editmodel:CompartmentEditModel" size="159,64">
+      <children xsi:type="editmodel:MethodEditModel" name="SearchEntry" size="159,14" id="{UMLID=_0aJshu16Ed-tjPs0XGx_jA,JavaID=org.rtens.cell/Parameters$SearchEntry#SearchEntry(Lorg.rtens.cell.Address;Lorg.rtens.cell.Path;)}"/>
+    </children>
+    <children xsi:type="editmodel:CompartmentEditModel"/>
+    <classifierPreferences xsi:type="editmodel:UMLClassDiagramClassifierPreference" showMethodsParameterTypes="true" showMethodsReturnType="true" attributeSorter="Natural" methodSorter="Natural" innerClassSorter="Natural" showPrivateAttributes="true" showProtectedAttributes="true" showPublicAttributes="true" showPackageAttributes="true" showStaticAttributes="true" showProtectedMethods="true" showPublicMethods="true" showPackageMethods="true" showStaticMethods="true" showProtectedInnerClasses="true" showPublicInnerClasses="true" showPackageInnerClasses="true" showPrivateInnerClasses="true" showStaticInnerClasses="true" packageIndication="2" showAssociationMember="false" showMethods="true" showAttributes="true" showLiterals="true" showAttributeParameterType="true" showMethodAssociationMember="false" showAccessorsMember="false"/>
+  </children>
+  <children xsi:type="editmodel:ClassEditModel" targetConnections="//@children.8/@sourceConnections.0 //@children.0/@sourceConnections.3 //@children.1/@sourceConnections.5 //@children.0/@sourceConnections.4" name="Address" location="314,211" size="96,140" timstampe="1097" stereotype="" id="{UMLID=_ZA6AQe12Ed-tjPs0XGx_jA,JavaID=org.rtens.cell/Address}" packageIndication="2" runTimeClassModel="Address(Lorg.rtens.cell.Host;[Lorg.rtens.cell.Path;),Address(Ljava.lang.String;Ljava.lang.String;[Lorg.rtens.cell.Path;),host,Address(Lorg.rtens.cell.Address;),hashCode(),equals(Ljava.lang.Object;),toString()">
+    <children xsi:type="editmodel:CompartmentEditModel"/>
+    <children xsi:type="editmodel:CompartmentEditModel" size="167,96"/>
+    <children xsi:type="editmodel:CompartmentEditModel"/>
+    <classifierPreferences xsi:type="editmodel:UMLClassDiagramClassifierPreference" showMethodsParameterTypes="true" showMethodsReturnType="true" attributeSorter="Natural" methodSorter="Natural" innerClassSorter="Natural" showPrivateAttributes="true" showProtectedAttributes="true" showPublicAttributes="true" showPackageAttributes="true" showStaticAttributes="true" showProtectedMethods="true" showPublicMethods="true" showPackageMethods="true" showPrivateMethods="true" showStaticMethods="true" showProtectedInnerClasses="true" showPublicInnerClasses="true" showPackageInnerClasses="true" showPrivateInnerClasses="true" showStaticInnerClasses="true" packageIndication="2" Minimize="true" showAttributeParameterType="true" showAttributeDefaultValue="true"/>
+  </children>
+  <children xsi:type="editmodel:ClassEditModel" targetConnections="//@children.1/@sourceConnections.0" name="Context" location="-14,1" size="71,28" timstampe="1370" stereotype="" id="{UMLID=_ZBWFIO12Ed-tjPs0XGx_jA,JavaID=org.rtens.cell/Context}" packageIndication="2" runTimeClassModel="send,receiver,Context(Lorg.rtens.cell.Context;),getReceiver(),Context(Lorg.rtens.cell.Context;Lorg.rtens.cell.Path;Lorg.rtens.cell.Send;),parent,setId(I),toString(),id,getId(),getRoot(),getMessageContext(Lorg.rtens.cell.Path;),getParent(),hashCode(),equals(Ljava.lang.Object;),getMessage(),getSend()">
+    <children xsi:type="editmodel:CompartmentEditModel" size="64,16"/>
+    <children xsi:type="editmodel:CompartmentEditModel" size="190,208"/>
+    <children xsi:type="editmodel:CompartmentEditModel"/>
+    <classifierPreferences xsi:type="editmodel:UMLClassDiagramClassifierPreference" showMethodsParameterTypes="true" showMethodsReturnType="true" attributeSorter="Natural" methodSorter="Natural" innerClassSorter="Natural" showPrivateAttributes="true" showProtectedAttributes="true" showPublicAttributes="true" showPackageAttributes="true" showStaticAttributes="true" showProtectedMethods="true" showPublicMethods="true" showPackageMethods="true" showPrivateMethods="true" showStaticMethods="true" showProtectedInnerClasses="true" showPublicInnerClasses="true" showPackageInnerClasses="true" showPrivateInnerClasses="true" showStaticInnerClasses="true" packageIndication="2" Minimize="true" showAttributeParameterType="true" showAttributeDefaultValue="true"/>
+  </children>
+  <children xsi:type="editmodel:ClassEditModel" targetConnections="//@children.1/@sourceConnections.6 //@children.1/@sourceConnections.4 //@children.1/@sourceConnections.3 //@children.0/@sourceConnections.5" name="Path" location="310,15" size="100,139" timstampe="21" stereotype="" id="{UMLID=_Y_aLdO12Ed-tjPs0XGx_jA,JavaID=org.rtens.cell/Path}" packageIndication="2" runTimeClassModel="Path([Lorg.rtens.cell.Path;),Path([Ljava.lang.String;),Path(),resolveRootAndSelf(),toString()">
+    <children xsi:type="editmodel:CompartmentEditModel"/>
+    <children xsi:type="editmodel:CompartmentEditModel" size="154,80"/>
+    <children xsi:type="editmodel:CompartmentEditModel"/>
+    <classifierPreferences xsi:type="editmodel:UMLClassDiagramClassifierPreference" showMethodsParameterTypes="true" showMethodsReturnType="true" attributeSorter="Natural" methodSorter="Natural" innerClassSorter="Natural" showPrivateAttributes="true" showProtectedAttributes="true" showPublicAttributes="true" showPackageAttributes="true" showStaticAttributes="true" showProtectedMethods="true" showPublicMethods="true" showPackageMethods="true" showPrivateMethods="true" showStaticMethods="true" showProtectedInnerClasses="true" showPublicInnerClasses="true" showPackageInnerClasses="true" showPrivateInnerClasses="true" showStaticInnerClasses="true" packageIndication="2" Minimize="true" showAttributeParameterType="true" showAttributeDefaultValue="true"/>
+  </children>
+  <children xsi:type="editmodel:ClassEditModel" targetConnections="//@children.0/@sourceConnections.2" name="Log" location="504,273" size="123,78" timstampe="201" stereotype="" id="{UMLID=_ZH6AIO12Ed-tjPs0XGx_jA,JavaID=org.rtens.cell/Log}" packageIndication="2" runTimeClassModel="org.rtens.cell.Log.Entry,toString()">
+    <children xsi:type="editmodel:CompartmentEditModel"/>
+    <children xsi:type="editmodel:CompartmentEditModel" size="101,16">
+      <children xsi:type="editmodel:MethodEditModel" name="toString" size="101,14" id="{UMLID=_fPlSkO2CEd-tjPs0XGx_jA,JavaID=org.rtens.cell/Log#toString()}" isAssociationMemeber="true"/>
+    </children>
+    <children xsi:type="editmodel:CompartmentEditModel" size="54,30"/>
+    <classifierPreferences xsi:type="editmodel:UMLClassDiagramClassifierPreference" showMethodsParameterTypes="true" showMethodsReturnType="true" attributeSorter="Natural" methodSorter="Natural" innerClassSorter="Natural" showPrivateAttributes="true" showProtectedAttributes="true" showPublicAttributes="true" showPackageAttributes="true" showStaticAttributes="true" showProtectedMethods="true" showPublicMethods="true" showPackageMethods="true" showStaticMethods="true" showProtectedInnerClasses="true" showPublicInnerClasses="true" showPackageInnerClasses="true" showPrivateInnerClasses="true" showStaticInnerClasses="true" packageIndication="2" showAssociationMember="false" showMethods="true" showAttributes="true" showLiterals="true" showAttributeParameterType="true" showMethodAssociationMember="false" showAccessorsMember="false"/>
+  </children>
+  <children xsi:type="editmodel:ClassEditModel" targetConnections="//@children.1/@sourceConnections.1" name="Entry" location="42,254" size="214,96" timstampe="201" stereotype="" id="{UMLID=_ZH6AIu12Ed-tjPs0XGx_jA,JavaID=org.rtens.cell/Log$Entry}" packageIndication="2" runTimeClassModel="Entry(Lorg.rtens.cell.Address;Ljava.lang.String;),description,Entry(Lorg.rtens.cell.Address;Ljava.lang.String;Lorg.rtens.cell.Parameters;),toString()">
+    <children xsi:type="editmodel:CompartmentEditModel" size="106,16">
+      <children xsi:type="editmodel:AttributeEditModel" name="description" size="106,14" id="{UMLID=_fTBBEu2CEd-tjPs0XGx_jA}"/>
+    </children>
+    <children xsi:type="editmodel:CompartmentEditModel" size="192,48">
+      <children xsi:type="editmodel:MethodEditModel" name="Entry" size="192,14" id="{UMLID=_fTBBFu2CEd-tjPs0XGx_jA,JavaID=org.rtens.cell/Log$Entry#Entry(Lorg.rtens.cell.Address;Ljava.lang.String;Lorg.rtens.cell.Parameters;)}"/>
+      <children xsi:type="editmodel:MethodEditModel" name="Entry" size="131,14" id="{UMLID=_fTKLCe2CEd-tjPs0XGx_jA,JavaID=org.rtens.cell/Log$Entry#Entry(Lorg.rtens.cell.Address;Ljava.lang.String;)}"/>
+    </children>
+    <children xsi:type="editmodel:CompartmentEditModel"/>
+    <sourceConnections xsi:type="editmodel:AssociationEditModel" autoLocated="true" id="{UMLID=_fTdF8O2CEd-tjPs0XGx_jA}" source="//@children.8" target="//@children.4" targetEnd="//@children.8/@sourceConnections.0/@children.2" label="//@children.8/@sourceConnections.0/@children.0" sourceEnd="//@children.8/@sourceConnections.0/@children.1" connectionRouterKind="Manhattan">
+      <children xsi:type="editmodel:WireLabelEditModel" size="0,14" fontInfo="Arial-8-0" anchorKind="MiddlePart"/>
+      <children xsi:type="editmodel:AssociationEndEditModel" name="ownedEnd" location="214,47" id="{UMLID=_fTdF8e2CEd-tjPs0XGx_jA}" attachSource="true" flags="1"/>
+      <children xsi:type="editmodel:AssociationEndEditModel" name="address" location="0,90" id="{UMLID=_fTBBEO2CEd-tjPs0XGx_jA}" multiplicityLabel="//@children.8/@sourceConnections.0/@children.2/@children.0" roleLabel="//@children.8/@sourceConnections.0/@children.2/@children.1" navigable="true" flags="1">
+        <children xsi:type="editmodel:LabelEditModel" name="1" location="301,308" size="6,14" fontInfo="Arial-8-0" anchorKind="LastPart"/>
+        <children xsi:type="editmodel:LabelEditModel" name="+ address" location="258,280" size="49,14" fontInfo="Arial-8-0" anchorKind="LastPart"/>
+      </children>
+    </sourceConnections>
+    <classifierPreferences xsi:type="editmodel:UMLClassDiagramClassifierPreference" showMethodsParameterTypes="true" showMethodsReturnType="true" attributeSorter="Natural" methodSorter="Natural" innerClassSorter="Natural" showPrivateAttributes="true" showProtectedAttributes="true" showPublicAttributes="true" showPackageAttributes="true" showStaticAttributes="true" showProtectedMethods="true" showPublicMethods="true" showPackageMethods="true" showStaticMethods="true" showProtectedInnerClasses="true" showPublicInnerClasses="true" showPackageInnerClasses="true" showPrivateInnerClasses="true" showStaticInnerClasses="true" packageIndication="2" showAssociationMember="false" showMethods="true" showAttributes="true" showLiterals="true" showAttributeParameterType="true" showMethodAssociationMember="false" showAccessorsMember="false"/>
+  </children>
+  <diagramOptions xsi:type="options:ClassDiagramOptions" properties="wireOptions=0" autoName="false"/>
+  <boardSetting snapToGeometry="true" gridEnabled="true" gridSpacing="14,14" gridOrigin="-14,-14" rulerUnit="cm" gridShow="true">
+    <leftRuler/>
+    <topRuler/>
+  </boardSetting>
+  <classDiagramPreferences xsi:type="editmodel:UMLClassDiagramPreference" showMethodsParameterTypes="true" showMethodsReturnType="true" attributeSorter="Natural" methodSorter="Natural" shortPackageNameFormat="true" showClassStereotype="true" showPackageStereotype="true" innerClassSorter="Natural" showPrivateAttributes="true" showProtectedAttributes="true" showPublicAttributes="true" showPackageAttributes="true" showStaticAttributes="true" showProtectedMethods="true" showPublicMethods="true" showPackageMethods="true" showPrivateMethods="true" showStaticMethods="true" showProtectedInnerClasses="true" showPublicInnerClasses="true" showPackageInnerClasses="true" showPrivateInnerClasses="true" showStaticInnerClasses="true" packageIndication="2" showInterfaceStereotype="true" showMethods="true" showAttributes="true" showLiterlas="true" showInnerEntity="true" showAttributeParameterType="true" showAttributeDefaultValue="true"/>
+</editmodel:ClassDiagramEditModel>

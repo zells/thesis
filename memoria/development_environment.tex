@@ -1,0 +1,236 @@
+
+\graphicspath{{figures/development_environment/}}
+
+%: ----------------------- chapter  -------------------------
+\chapter{Environment}
+\label{chap:development_environment}
+
+The previous chapter described the programming model which forms the kernel of the presented software platform. In order to develop applications, further components are needed such as a parser for descriptions of behaviour, connection with local and remote systems and library support for modification of cells and common programming tasks. Unlike the programming model, the components described in this chapter are considered interchangeable.
+
+
+%: ----------------------- section  -------------------------
+\section{Storage}
+\label{sec:storage}
+
+Cells are stored persistently using the file system by mapping a folder tree directly onto the cell hierarchy. A new cell tree is created by creating a new folder which contains the definition of the root cell. Cell definitions consist of a file "$<$cellName$>$.cell" which specifies the properties of a cell, and a folder "$<$cellName$>$" which contains the definitions of its child cells. Figure \ref{fig:tree_mapping} shows an exemplary folder tree and its corresponding cell tree.
+
+\figuremacro{tree_mapping}{Mapping files and folders onto a cell tree}{Mapping files and folders onto a cell tree.}
+
+\subsection{Syntax}
+
+The syntax presented in this section can be used to describe reactions of cells. The production rules of the syntax are given in Extended Backus-Naur Form where brackets represent options, bracelets repetition and parentheses groups.
+
+As described in Section \ref{sec:reaction}, a reaction consists of a list of mailings, each containing the paths of the receiver and message cells. In their textual description, mailings are separated by new line characters (LF and/or CR) and the paths by white-space characters. Each path is a list of cell names (including aliases) separated by dots. This leads to the production rules of Figure \ref{fig:syntax_reaction}.
+
+\syntax{syntax_reaction}{Syntax of reaction and paths}{
+Reaction = [Mailing~\{ \textit{NL}~Mailing\}]\linebreak
+Mailing = Receiver~\textnormal{\_}~Message\linebreak
+Receiver = Path\linebreak
+Message = Path\linebreak
+Path = Name~\{\textnormal{'.'}~Name\}
+}{Production rules for syntax of reaction and paths.}
+
+Cell names can consist of any combination of printable and non-printable characters. Names containing a reserved character such as dots, spaces and new-line have to be quoted. Inside quoted names, backslashes must be used to escape quotation marks and backslashes. Thus, names containing backslashes or quotation marks also have to be quoted. The production rules for cell names are given in Figure \ref{fig:syntax_names}.
+
+\syntax{syntax_names}{Syntax of cell names}{
+Name = Unquoted~|~Quoted\linebreak
+Unquoted = \{\textnormal{ANY} - Reserved\}+\linebreak
+Quoted = [Unquoted]~QuotedPart~[Unquoted]\linebreak
+QuotedPart = \textnormal{'"'}~\{ (\textnormal{ANY} - Escaped)~|~(\textnormal{'}\backslash\textnormal{'}~Escaped) \}+~\textnormal{'"'}\linebreak
+Reserved = \textnormal{\_}~|~\textnormal{'.'}~|~Escaped\linebreak
+Escaped = \textnormal{'"'}~|~\textnormal{'}\backslash\textnormal{'}\linebreak
+\textnormal{\_} = \{\textnormal{' '}~|~\textnormal{TAB}\}+\linebreak
+\textit{NL} = \{\textnormal{LF}~|~\textnormal{CR}\}+
+}{Production rules for syntax of cell names.}
+
+\subsection{File Format}
+
+A cell definition file has the same name as the cell plus the extension ".cell". It uses the Extensible Mark-up Language (XML) \nomenclature{XML}{Extensible Mark-up Language} to define the cell's stem path and its reaction. The involved XML elements are the root element \element{cell} with its optional sub-elements \element{stem} and \element{reaction} which contain the path of the stem cell and the reaction, respectively. The stem path and the reaction are described using the syntax of the previous section.
+
+The \element{cell} and \element{reaction} elements have an optional boolean attribute \element{native} (which defaults to \element{false}) which indicates, if set to \element{true}, that the cell or its reaction is defined on kernel level and not in the definition file. Listing \ref{lst:definition_file} shows an exemplary complete cell definition file.
+
+\begin{lstlisting}[mathescape, float=htbp, label=lst:definition_file, 
+caption=Cell definition file, language=XML]
+<?xml version="1.0" encoding="UTF-8"?>
+<cell native="false">
+	<stem>$^\circ$.Path.Of.StemCell</stem>
+	<reaction native="false">
+		First.Receiver	First.Message
+		$^\circ$.Another.One		And.Its.MessageCell
+ 	</reaction>
+</cell>
+\end{lstlisting}
+
+\subsection{Implementation}
+
+Classes involved in loading, parsing and storing of cell definitions in files are shown in the class diagram of Figure \ref{fig:loader_classes}. A cell hierarchy uses a single instance of \code{CellLoader} which is connected with the folder that contains the hierarchy, passed as its constructor's argument. The \code{getChild()} method is used to load the root cell. 
+
+All further cells are loaded on demand during path resolution. The first time a cell has to resolve a child, it loads its children using the \code{getChildren()} method. An XML parser not contained in the diagram parses and assembles cell definition files. Paths and reactions are parsed by \code{PathFormat} and \code{ReactionFormat} respectively.
+
+If a cell or its reaction is marked \textit{native} in the cell definition file, the \code{CellLoader} searches in loaded libraries for a class whose name matches the cell path. The mapping of cell paths to class names has therefore to be unambiguous.
+
+\figuremacro{loader_classes}{Diagram of cell loader classes}{Class diagram of classes involved in cell loading and parsing.}
+
+%: ----------------------- section  -------------------------
+\section{Distribution}
+\label{sec:distribution}
+
+A requirement of the software platform is completely transparent distribution. Cells exist in a global virtual space where each cell can be reached using its path regardless on which host of a network it actually exists. Thus cells can also migrate arbitrarily within a network.
+
+This chapter describes the architecture of distributed cell systems, how these are configured, stored and the implementation of the distributed binding algorithm.
+
+\subsection{Architecture}
+
+Cells of different hosts are connected using an unidirectional peer-to-peer architecture. Each cell can be connected to a number of peer cells, which are cells in the same position of a cell hierarchy on different hosts. Figure \ref{fig:distribution_architecture} shows an exemplary connection between cells on three different hosts.
+
+A cell consists therefore of the union of itself and all its peers, directly or indirectly connected. Cell properties such as stem cell paths, reactions, children and peers may be distributed, moved and replicated arbitrarily throughout the distributed system. In the example in Figure \ref{fig:distribution_architecture}, the complete list of children of \cell{A} is \cell{B}, \cell{C}, \cell{E} and \cell{F} which are all reachable from all hosts. Due to redundancy of peer connections in the example, cell \cell{A.C.D} of host 2 is reachable in four ways from host 1.
+
+\figuremacro{distribution_architecture}{Architecture of cell distribution}
+{Architecture of distributed cells using unidirectional connections between peers.}
+
+\subsection{File Format}
+
+Cell definition files can be extended by \element{peer} elements to configure connections between cells. Each peer connection is defined by a \element{network} and a \element{host} element which contain a network identifier and the address of the host within this network. Listing \ref{lst:peer_definition} shows the definition file of a cell with one peer connected over a TCP/IP socket.\nomenclature{TCP}{Transmission Control Protocol}\nomenclature{IP}{Internet Protocol}
+
+\begin{lstlisting}[mathescape, float=htbp, label=lst:peer_definition, 
+caption=Cell definition file with peer definition, language=XML]
+<?xml version="1.0" encoding="UTF-8"?>
+<cell>
+	<peer>
+		<network>Socket</network>
+		<host>localhost:42</host>
+	</peer>
+</cell>
+\end{lstlisting}
+
+\subsection{Implementation}
+
+Peer connections are implemented using a client-server architecture. Figure \ref{fig:distribution_classes} shows a class diagram of the classes used in the current version. The root of a cell hierarchy is associated with one instance the abstract class \code{Server} for each network it is connected with. Clients are implemented by subclasses of the abstract class \code{Peer}. Subclasses of \code{Server} and \code{Peer} correspond to different networks and are therefore parallel as demonstrated by the \code{SocketServer} and \code{SocketPeer} classes which connect over a TCP/IP socket.
+
+\figuremacro{distribution_classes}{Diagram of classes involved in distribution}
+{Class diagram of classes involved in distribution.}
+
+The factory method \code{create()} of \code{Peer} creates new peers based on the network identifier contained in the \code{Address} argument. The host address is parsed by the subclass, for example "localhost:42" is parsed by the constructor of \code{SocketPeer} into the host name "localhost" and port 42.
+
+If a child cell was not found locally within its parent, the method \code{tryPeers()} is invoked in line 21 in Listing \ref{lst:binding_algorithm} which forwards the delivery to the peers of the current cell and all parents.
+
+The \code{deliver()} method of \code{SocketPeer} transmits the path of the current cell, the delivery stack, the message path and the delivery identifier to the host specified by the peer instance. The server spawns a new thread, resolves the path of the current cell and invokes it \code{deliver()} method with the transmitted arguments. If the connection times out or the peer cell on can not be resolved by the server, the cell is regarded as not existing.
+
+%: ----------------------- section  -------------------------
+\section{Kernel Cells}
+\label{sec:kernel_cells}
+
+Every cell has a child named \cell{cell} which contains a set of cells called \textit{kernel cells} that reflect all of the cell's properties. These cells can be used to dynamically change the cell's name, its reaction, add or remove children or peers and so on. Kernel cells cannot be deactivated thus the properties of a cell can always be read and modified, even if it is deactivated. Figure \ref{fig:kernel_cells} shows composition and specialization of all implemented kernel cells in an entity-relationship diagram.
+
+\figuremacro{kernel_cells}{Entity-relationship diagram of reflection cells}
+{Entity-relationship diagram of cells that can be used for dynamic modification of cell properties. Arrows indicate "is-a" relationships; lines with multiplicities indicate "has-a" relationships.}
+
+Note that the child \cell{cell} is not inherited but implemented as an implicit child. Therefore it has to be handled as a special case by the binding algorithm regarding resolution and adoption which is not included in the listings of Section \ref{sec:implementation}. It's resolution is recognized by \code{getNextDeliverer()} which loads the corresponding \code{Cell} object using the \code{getKernel()} method of \code{Cell}. This is necessary since kernel cells need local access to their target cell and reactions of inherited cells may execute on a different host than the inheriting cell.
+
+%: ----------------------- section  -------------------------
+\section{Library}
+\label{sec:library}
+
+The kernel of the software platform only provides mechanisms for distributed and concurrent message passing. All further components such as data types and control structures are part of a cell library. The following sections contain descriptions of all library cells implemented in the current version of the software platform. It is a minimal implementation consisting only of cells necessary for the applications described in Chapter \ref{chap:graphical_interface} and and Section \ref{sec:experience}. The path of the stem cell is given after a colon unless it is \cell{$\circ$.Cell}. All cell paths are relative to the root cell.
+
+\subsection{General}
+\begin{description}
+\item[Cell]{Default stem and and root of specialization hierarchies.}
+
+\item[Cell.respond]{Creates a new cell \cell{response} as child of its parent with the receiver cell as its stem.}
+
+\item[Cell.equals]{Considers the message cell equal to its parent cell if it contains the same child cells and all of the children consider themselves equal as well. The cell can be overridden to implement a domain-specific definition of equality.}
+
+\item[Zells]{Container of the generic cell library.}
+
+\end{description}
+
+\subsection{Data Types}
+\begin{description}
+\item[Zells.Boolean]{Abstract basic boolean value.}
+
+\item[Zells.Boolean.or]{Abstract cell for the boolean OR operation.}
+
+\item[Zells.Boolean.and]{Abstract cell for the boolean AND operation.}
+
+\item[Zells.True : Zells.Boolean]{Represents the boolean true value.}
+
+\item[Zells.True.or]{Responds True.}
+
+\item[Zells.True.and]{Responds with the received message.}
+
+\item[Zells.False : Zells.Boolean]{Represents the boolean false value.}
+
+\item[Zells.False.or]{Responds with the received message.}
+
+\item[Zells.False.and]{Responds False.}
+
+\item[Zells.Number]{Abstract type for numbers.}
+
+\item[Zells.Number.equals]{Considers the message cell equal to its parent if it specializes a number with the same value.}
+
+\item[Zells.Number.add]{Replies the sum of its parent and the message cell (must specialize a literal number).}
+
+\item[Zells.Number.subtract]{Subtracts the message cell (must specialize a literal number) from its parent.}
+
+\item[Zells.String : Zells.List]{Basic abstract stem cell for strings. A string is a list of characters.}
+
+\item[Zells.Character]{Basic abstract stem cell for characters.}
+
+\item[Zells.Literal.Number]{Parent of all literal numbers, negative and positive. Floating point numbers are children of literal numbers. Examples are \cell{Zells.Literal.Number.42, Zells.Literal.Number.-5} and \cell{Zells.Literal.Number.5.23}.}
+
+\item[Zells.Literal.String]{Parent of all literal strings which are lists of literal characters. Examples are \cell{Zells.Literal.String."Hello World"} and \cell{Zells.Literal.String.Test}. Note that alias cells result in literal strings as well, e.g. \cell{Zells.Literal.String.parent} corresponds to the string "parent" rather than the cell \cell{Zells.Literal.String}.}
+\item[Zells.Literal.Character]{Parent of literal characters such as \cell{Zells.Literal.Character.A} and \cell{Zells.Literal.Character.?}.}
+
+\item[Zells.List]{Basic abstract type for all numbered lists. Elements are children of the list with the index number as their names.}
+
+\item[Zells.List.add]{Adds and element to the end of the list which specializes the message cell and replies the new element.}
+
+\item[Zells.List.remove]{Removes element at position of message cell which specializes a literal number and replies the removed element. The indices of all following elements are decremented.}
+
+\item[Zells.List.clear]{Removes all elements of the list.}
+
+\end{description}
+
+\subsection{Control Structures}
+\begin{description}
+\item[Zells.Boolean.ifTrue]{Has an empty reaction.}
+
+\item[Zells.Boolean.ifFalse]{Has an empty reaction }
+
+\item[Zells.True.ifTrue]{Executes the reaction of its message by sending it a message.}
+
+\item[Zells.False.ifFalse]{Executes the reaction of its message by sending it a message.}
+
+\item[Zells.List.each]{Sends all of its parent's children to the message cell.}
+
+\end{description}
+
+
+\subsection{Reflection}
+\begin{description}
+\item[Cell.cell]{Container of all reflection cells.}
+
+\item[Cell.cell.create]{Provides a short-cut to for creating new cells. By sending a message to one of its children, it creates a new cell with the name of the child and the message as stem cell.}
+
+\item[Cell.cell.Name : Zells.String]{Specializes literal string that corresponds to name of cell. Only if the its stem is changed directly, the cell's name is changed.}
+
+\item[Cell.cell.Stem : Zells.Reflection.Path]{Specializes a \cell{Path} that reflects the stem cell path. Its stem cell can not be changed, thus it has to be modified directly to change stem cell.}
+
+\item[Cell.cell.Reaction : Zells.List]{Reflects reaction of cell as list of \cell{Send}s. Has to be directly modified as well.}
+
+\item[Cell.cell.Children : Zells.List]{Reflects the cell's own children (no inherited nor distributed children) as a list of their names.}
+
+\item[Cell.cell.Active : Zells.Boolean]{Reflects the activation status of the cell. Stem has to be modified directly to change state.}
+
+\item[Cell.cell.Peers]{Contains list of connected peers, each with its address as name. Elements of this list are cells which only access their local parts and do not forward deliveries to other peers.}
+
+\item[Zells.Reflection.Path : Zells.List]{Represents a cell path as list of strings.}
+
+\item[Zells.Reflection.Mailing]{Abstract cell to represent mailings which structure receiver and message paths.}
+
+\item[Zells.Reflection.Send.Message : Zells.Reflection.Path]{Specializes the path of the message cell.}
+
+\item[Zells.Reflection.Send.Receiver : Zells.Reflection.Path]{Specializes receiver cell path.}
+
+\end{description}

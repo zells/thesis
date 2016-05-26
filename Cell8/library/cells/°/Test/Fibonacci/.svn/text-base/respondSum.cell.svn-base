@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cell>
+  <stem>°.Cell</stem>
+  <reaction>cell.create.minusOne              °.Zells.Literal.Number.1
+	parent.parent.message.subtract    minusOne
+	parent.parent.parent              minusOne.response
+	cell.create.minusTwo              °.Zells.Literal.Number.2
+	parent.parent.message.subtract    minusTwo
+	parent.parent.parent              minusTwo.response
+	minusOne.response.response.add    minusTwo.response.response
+	parent.parent.message.respond     minusTwo.response.response.response</reaction>
+</cell>
+

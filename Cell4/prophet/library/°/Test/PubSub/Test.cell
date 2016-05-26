@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cell>
+  <stem>°.Cell</stem>
+  <reaction>ch1.publish    Events.A
+	ch1.publish    Events.B</reaction>
+</cell>
+

@@ -1,0 +1,66 @@
+package org.rtens.cell.test;
+
+import org.rtens.cell.*;
+
+import junit.framework.TestCase;
+
+import org.rtens.cell.glue.PathFormat;
+import org.rtens.cell.test.TestReceive.*;
+
+public class TestKernelCells extends TestCase {
+	
+	private Cell root;
+	
+	public void testAccess() {
+		root.addChild(new MockCell("A", new Path("°", "B")));
+		root.addChild(new MockCell("B"));
+		
+		Result r = send("A.stem.cell");
+		
+		assertTrue(r.wasDelivered());
+		assertEquals(new Path("°", "B", "cell"), r.getReceiverPath());
+	}
+	
+	public void testReadName() {
+		root.addChild(new MockCell("A"));
+		
+		root.addChild(new MockCell("Prophet"))
+				.addChild(new MockCell("Literal"))
+				.addChild(new MockCell("String"))
+				.addChild(new MockCell("A"));
+		
+		Result r = send("A.cell.Name.stem.cell");
+		
+		assertTrue(r.wasDelivered());
+		assertEquals("°.Prophet.Literal.String.A.cell", r.getReceiverPath().toString());
+	}
+	
+	public void testReachCertainPeer() {
+		MockCell a1 = (MockCell)root.addChild(new MockCell("A").withReaction());
+		
+		MockCell root2 = new MockCell("°");
+		MockCell a2 = (MockCell)root2.addChild(new MockCell("A").withReaction());
+		
+		root.addPeer(new MockPeer(root2, 2));
+		
+		Result r = send("A.cell.Peers.local:2");
+		
+		assertEquals("°.A.cell.Peers.local:2", r.getReceiverPath().toString());
+		assertEquals(1, a2.response.executed);
+		assertEquals(0, a1.response.executed);
+	}
+	
+	private Result send(String receiver) {
+		try {
+			return root.send(new Send(PathFormat.parse(receiver), new Path()), TestReceive.rootContext());
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	@Override
+	protected void setUp() throws Exception {
+		root = new Cell("°").setActive(true);
+	}
+	
+}

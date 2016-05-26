@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cell>
+  <stem>parent.parent.Subscriber</stem>
+  <reaction>°.Prophet.Console.print    °.Prophet.Literal.String."Sub1 received"</reaction>
+</cell>
+

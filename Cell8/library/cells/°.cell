@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cell>
+  <peer>
+    <network>Socket</network>
+    <host>localhost:42</host>
+  </peer>
+</cell>
+

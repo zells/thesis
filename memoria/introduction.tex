@@ -1,0 +1,85 @@
+
+% this file is called up by thesis.tex
+% content in this file will be fed into the main document
+
+%: ----------------------- introduction file header -----------------------
+
+% the code below specifies where the figures are stored
+\graphicspath{{figures/introduction/}}
+
+% ----------------------------------------------------------------------
+%: ----------------------- introduction content ----------------------- 
+% ----------------------------------------------------------------------
+
+\chapter{Introduction}
+\label{chap:introduction}
+
+Personal computing has made remarkable advances and became omnipresent during the last decades but like Turing Award winner and personal computing pioneer Alan Kay states repeatedly "the computer revolution has not happened yet" \cite{ComputerRevolution}. Computers have not yet had an impact comparable to the printing press for example, which not only changed completely how argumentation was done but also what was argued about. This change took approximately 150 years to happen so it is not a surprise that 30 years after their introduction, personal computers are still used as a faster and cheaper imitation of paper, recordings, films and television.
+
+In order for a computer revolution to happen, \textit{computer literacy} needs to reach a critical mass, which is not only the ability to read and write but also to understand and argue about ideas that are worth writing about. What words are to printing, dynamic models are to computing, thus computer literacy is the ability to analyse and build models, understand the ideas they represent and use them to argue about these ideas.
+
+This requires tools to build and share dynamic models like letters and books are used for printing. But in computer science still no common set of letters exists and the tools are only available to a small group of specialized users called programmers. Two of the most powerful tools are abstraction and distribution.
+
+\section{Abstraction}
+
+The single most important principle of computer science is abstraction \cite{ComputingDiscipline, abstractionInCs, StructureOfComputerPrograms}. It began with the division of software and hardware in the \textit{von Neumann} architecture and was continued with the appearance of programming languages and operating systems. With the increasing computational power, every generation of programming languages used a higher level of abstraction of the machine it is running on. 
+
+Not only the abstraction of the programming models has evolved but also the ability to create new abstractions with the language \cite{Generations}. This development led from the first machine language over assembly languages to high level languages. At the cost of performance, each generation increased the expressiveness of the programming language and thus decreased the time necessary for development and maintenance. As a result, modern object-oriented languages do not require any knowledge of the underlying hardware and can be used efficiently to model dynamic software systems.
+
+Besides the ability to build more complex systems in less time, abstraction also brings the advantages of re-usability and interoperability \cite{PowerOfAbstraction}. By hiding differences and emphasizing similarities, abstract models can be re-used for different but similar problems and communicate with each other more easily by ignoring unimportant details.
+
+All of these advantages however, are restricted to the production of software. Because internals of a computer program are invisible to the end user, he can not benefit from the concepts used to build it. The world of the end user, which consists of files and programs has little connection with the world of objects, which resides inside programs. This affects software developers more than users since most programs work around this deficiency and hide it from the user. But few programs or software platforms let their users profit from the full power of abstraction. As a consequence, in personal computing there are many almost-the-same things which have to be treated differently because there exists no abstraction for them. An example are common problems with different file formats and encodings for documents, pictures and videos which require different viewers. Also web pages and local programs are nowadays quite similar but work differently for historical reasons.
+
+It is also due to historical reasons that many modern programming languages lack of consistency \cite{ReshapingJava}. Some of the most widespread languages for example use a hybrid approach for backwards compatibility \cite{JavaCritics} and to allow access to lower abstraction levels \cite{CppCritics}. While different levels of abstraction are important to optimize efficiency, the lack of consistency increases the complexity of the programming models and compromises their expressiveness. These approaches also violate the core system building principle of separating meaning and optimization \cite{Steps2008}. But even the most purely object-oriented languages involve parts which are not objects or substantially different, such as packages, modules, methods or closures. Other components are not even part of the object model and can not be abstracted at all or only with difficulties such as location, file systems and databases.
+
+\section{Distribution}
+
+When the World Wide Web was designed for sharing scientific documents, its creators did not anticipate the way it was going to be used twenty years later. The strength and weakness of HTTP\nomenclature{HTTP}{Hypertext Transport Protocol} and HTML\nomenclature{HTML}{Hyptertext Mark-up Language} is simplicity and the resulting proliferation. Due to its limitations, a vast ecosystem of complement technologies has emerged to provide rich internet applications without compromising accessibility. Nowadays, even a simple dynamic web page involves at least four different technologies plus the knowledge of differences amongst interpreters.
+
+Despite these hurdles, the popularity of internet applications has increased significantly over the last decade. This development has led to a browser-centric usage in personal computing today which resembles the use of terminal computers in the '80s. Internet applications run mostly on powerful servers with a very slim client which provides little more than a graphical interface for user interaction. For the software producers this brings many advantages in the areas of deployment, maintenance, scaling and not at last control over user data. The user does not only have to accept the lost of control over his data but also has do deal with conflicting software models which results in bookmarks and "back" buttons being mostly useless in internet applications.
+
+A software platform which is aimed at the needs of modern personal computing would provide the the possibility to connect to any other system and share any kind of data in a safe and transparent way. To be able to do so, data must not be static but consist of dynamically responding entities that carry all information with them that is needed for presentation and manipulation. Also, these entities can be communicated with and their abilities explored dynamically. Using a common minimal interface for presentation and interaction, all parts of such a system could be used interchangeably when used to assemble new systems.
+
+The biggest increase of productivity in software development does not come from more powerful tools or programming languages but from software reuse \cite{SilverBullet}. The majority of programming tasks consists of connecting existing software modules rather than creating new ones. But still, the wheel is re-invented many times since there is no wide-spread completely distributed system of dynamically explorable modules. Such a system would give every user access to a global collection of already existing solutions and also the ability to share his own ideas with the world.
+
+It would also leverage the power of connection to create a \textit{personal internet} whose users are able to connect their own devices as peers to form a virtual computer whose data is distributed over the peers and only dynamically cached on the devices. This way any personal information and programs can be accessed in the same manner as any other resource made available by other users without compromising privacy but also without having to distinguish between local and remote services. There does not even exist a distinction between data and programs since all parts of the system are dynamic.
+
+\section{Aims}
+
+In order to build a completely coherent personal computing system that separates meaning from optimization, it has to be based on a programming model that incorporates the concepts of abstraction and distribution. It has to enable the user to dynamically model software systems inside a virtual space in a manner close to natural processes. This programming model has to be implemented into a runtime environment that supports the complete personal computer platform.
+
+The result is a model of virtual objects which exist independent of any hardware. Computers only serve as portals that connect the virtual with the real world. Objects are living things that can be interacted with by sending them messages. To keep the communication as simple as possible, it is unidirectional, the receiver always reacts in the same way and the message is another object. Systems that are too complex to be modelled by a single object are composed by objects in \textit{has-a} relationships. And to allow abstraction, objects also have \textit{is-a} relationships with other objects.
+
+The model is an abstraction of other object-oriented programming models, based on asynchronous message passing, prototypes and inheritance. It is an abstraction because it uses only one entity to encapsulate behaviour and state which plays the roles of classes, objects, methods and closures. Furthermore, it imposes a minimum of structure and protocol to increase interoperability and extensibility. It also can be arbitrarily nested and uses specialization and inheritance. The model is completely distributed which means it treats all objects equally, regardless of their location. As a consequence, it is also completely concurrent since all computation can possibly be carried out on different systems.
+
+\section{Characteristics}
+
+These requirements are fulfilled by the programming model presented in this thesis which has the following characteristics. To the best of our knowledge, no other software platform or programming language possesses all of these characteristics.
+
+\begin{description}
+\item[Completely concurrent.] Objects are independent of processor units and react instantly to a message. The only operation is therefore asynchronous message passing. The model includes a form of data flow for synchronization.
+
+\item[Completely late bound.] Messages can only be sent to an object using its address. An address is always name-based thus all communication is late bound.
+
+\item[Completely distributed.] Objects are also independent of physical memory so they are not bound to any device but are distributed in a network connecting an arbitrary number of devices. Name resolution is performed by the objects, leading to a distributed directory.
+
+\item[Completely persistent.] Since objects do not depend on any hardware, they are not destroyed if a program is closed or a device shut down. Once created, an object continues existing until deleted explicitly.
+
+\item[Completely dynamic.] All objects of the model can have behaviour, i.e. are dynamic and living entities. New objects are created and existing ones modified by sending messages to other objects. Hence there is no intrinsic distinction between compile and run time.
+
+\item[Minimal structure.] Objects do not have any internal structure but can form compositional hierarchies. Thus objects serve as modules by containing other objects in a part-whole relationship. There are no classes, but objects serve as prototypes for new objects. Objects also do not have methods but always react with the same behaviour.
+
+\item[Minimal association.] Except composition, the only association between objects is specialization. An object that specializes another object inherits all of its properties.
+
+\end{description}
+
+\section{Outline}
+
+This thesis presents the implementation of the described programming model as the prototype of a software platform. Methods and techniques used during its development are described in the following chapter. 
+
+The architecture of the resulting platform is illustrated in Figure \ref{fig:architecture} with the outline of the chapters describing its parts indicated by arrows. Chapter \ref{chap:programming_model} contains a detailed description of the programming model supported by a biological metaphor, an iterative example and the implementation of the platform's kernel. The kernel's environment is presented in Chapter \ref{chap:development_environment} consisting of mechanisms to connect the kernel to the local and remote systems and library support for reflection and generic components. Chapter \ref{chap:graphical_interface} describes graphical development tools on application level. 
+
+The remaining chapters contain a discussion of results of the project and an outlook on future challenges along with conclusions.
+
+\figuremacro{architecture}{Architecture of software platform}
+{Architecture of the software platform and outline of this document.}

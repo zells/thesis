@@ -1,0 +1,76 @@
+package org.rtens.cell;
+
+import java.io.Serializable;
+import java.util.HashSet;
+
+import org.rtens.cell.Parameters.SearchEntry;
+
+public class Result implements Serializable {
+	
+	private Path received;
+	
+	private Peer heir;
+	
+	private Parameters heirsParams;
+	
+	private HashSet<SearchEntry> searched = new HashSet<SearchEntry>();
+	
+	public Log log = new Log();
+	
+	//	{
+	//		@Override
+	//		public boolean add(Entry e) {
+	//			System.out.println(e);
+	//			return super.add(e);
+	//		};
+	//	};
+	
+	public boolean wasDelivered() {
+		return received != null;
+	}
+	
+	public Path getReceiverPath() {
+		return received;
+	}
+	
+	public Result proposeHeir(Peer cell, Parameters p) {
+		if (heir == null ||
+				p.steps > heirsParams.steps) {
+			heir = cell;
+			heirsParams = new Parameters(p);
+		}
+		return this;
+	}
+	
+	public Result deliveredTo(Path path) {
+		received = path;
+		return this;
+	}
+	
+	public Peer getHeir() {
+		return heir;
+	}
+	
+	public Parameters getHeirsParams() {
+		return heirsParams;
+	}
+	
+	public HashSet<SearchEntry> getSearched() {
+		return searched;
+	}
+	
+	public boolean hasHeir() {
+		return heir != null;
+	}
+	
+	@Override
+	public String toString() {
+		String s = wasDelivered() ? "Delivered: " + received : "Not Delivered";
+		
+		if (hasHeir())
+			s += "  ----- Heir: " + heir + "(" + heirsParams.steps + ")";
+		
+		return s;
+	}
+	
+}

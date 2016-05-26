@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cell>
+  <stem>°.Test.PubSub.Subscriber.wants</stem>
+  <reaction>°.Test.PubSub.Test.Events.B.is    message</reaction>
+</cell>
+
